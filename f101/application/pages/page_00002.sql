@@ -69,7 +69,7 @@ wwv_flow_api.create_page(
 '',
 '<p>Click the <strong>Reset</strong> button to reset the interactive report back to the default settings.</p>'))
 ,p_last_updated_by=>'ADMIN'
-,p_last_upd_yyyymmddhh24miss=>'20210922133752'
+,p_last_upd_yyyymmddhh24miss=>'20210923234429'
 );
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(8564198179351905)
@@ -83,9 +83,11 @@ wwv_flow_api.create_page_plug(
 'select ID,',
 '       NAME,',
 '       LOCATION',
-'  from DEPARTMENTS'))
+'  from DEPARTMENTS t'))
 ,p_plug_source_type=>'NATIVE_IR'
 ,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
+,p_plug_display_condition_type=>'REQUEST_EQUALS_CONDITION'
+,p_plug_display_when_condition=>'1'
 ,p_prn_content_disposition=>'ATTACHMENT'
 ,p_prn_document_header=>'APEX'
 ,p_prn_units=>'INCHES'
@@ -180,7 +182,7 @@ wwv_flow_api.create_worksheet_rpt(
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(8567077099351930)
 ,p_plug_name=>'Breadcrumb'
-,p_region_template_options=>'#DEFAULT#:t-BreadcrumbRegion--useBreadcrumbTitle'
+,p_region_template_options=>'#DEFAULT#:t-BreadcrumbRegion--compactTitle:t-BreadcrumbRegion--useBreadcrumbTitle'
 ,p_component_template_options=>'#DEFAULT#'
 ,p_plug_template=>wwv_flow_api.id(8470498392351734)
 ,p_plug_display_sequence=>20
@@ -188,6 +190,7 @@ wwv_flow_api.create_page_plug(
 ,p_menu_id=>wwv_flow_api.id(8403442128351690)
 ,p_plug_source_type=>'NATIVE_BREADCRUMB'
 ,p_menu_template_id=>wwv_flow_api.id(8527584491351767)
+,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
 );
 wwv_flow_api.create_page_button(
  p_id=>wwv_flow_api.id(8566234991351925)
@@ -195,9 +198,9 @@ wwv_flow_api.create_page_button(
 ,p_button_plug_id=>wwv_flow_api.id(8564198179351905)
 ,p_button_name=>'RESET_REPORT'
 ,p_button_action=>'REDIRECT_PAGE'
-,p_button_template_options=>'t-Button--iconLeft'
+,p_button_template_options=>'t-Button--mobileHideLabel:t-Button--iconLeft'
 ,p_button_template_id=>wwv_flow_api.id(8526283405351766)
-,p_button_image_alt=>'Reset'
+,p_button_image_alt=>'Reset 2'
 ,p_button_position=>'RIGHT_OF_IR_SEARCH_BAR'
 ,p_button_redirect_url=>'f?p=&APP_ID.:2:&SESSION.::&DEBUG.:RR::'
 ,p_icon_css_classes=>'fa-undo-alt'

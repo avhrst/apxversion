@@ -1,25 +1,18 @@
 package main;
+
 import static main.Util.*;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.Properties;
-import javax.crypto.spec.SecretKeySpec;
 
-import org.jasypt.util.text.BasicTextEncryptor;
 
 public class App {
-
     static String lockId;
     static String branchName;
-    static SecretKeySpec key;
-
     static String appUser;
     static String appWorkspace;
     static String apexShema;
@@ -32,93 +25,36 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
-        File propertiesFile = new File("config.properties");
-        Properties props = new Properties();
-
-         String secretKey = "PI31415926";
-      
         // Enter data using BufferReader
         BufferedReader consReader = new BufferedReader(new InputStreamReader(System.in));
 
-        // Read properties from disk
-        FileReader reader = new FileReader(propertiesFile);
-        props.load(reader);
-        reader.close();
-
-        appUser = props.getProperty("apex.user");
-        if (appUser == null) {
-            System.out.println("Enter the APEX user");
-            appUser = consReader.readLine();
-            SetProperty(propertiesFile, props, "apex.user", appUser);
+        // Read property file
+        try {
+            Util.ReadPropertyFile();
+        } catch (Exception e) {
+            Util.NewPropertyFile();
         }
 
-        appWorkspace = props.getProperty("apex.workspace");
-        if (appWorkspace == null) {
-            System.out.println("Enter the APEX workspace");
-            appWorkspace = consReader.readLine();
-            SetProperty(propertiesFile, props, "apex.workspace", appWorkspace);
-        }
+        appUser =  GetPropertyValue("apex.user","Enter the APEX user, this should be the developer's login",consReader);
+        appWorkspace =  GetPropertyValue("apex.workspace","Enter the name of the APEX workspace you want to monitor",consReader);
+        apexShema =  GetPropertyValue("apex.shema","Enter shema name where APEX is installed (APEX_XXXXXX)",consReader);
+        dbHost =  GetPropertyValue("database.host","Enter the host where the database is installed",consReader);
+        dbPort =  GetPropertyValue("database.port","Enter the port the database is using",consReader);
+        dbServiceName =  GetPropertyValue("database.servicename","Enter the Database service name",consReader);
+        dbUser =  GetPropertyValue("database.user","Enter the name of the database user who has read and write privileges to the APEX_" + apexShema  + "  schema. (It could be SYSTEM) ",consReader);
+        dbPassword = GetPasswordProperty("database.password","Enter the password to connect to the database",consReader);
+        String intervalSecStr  =  GetPropertyValue("util.interval","Set the refresh interval in seconds (Recommended value - 5 sec)",consReader);
 
-        apexShema = props.getProperty("apex.shema");
-        if (apexShema == null) {
-            System.out.println("Enter the APEX shema (APEX_XXXXXX)");
-            apexShema = consReader.readLine();
-            SetProperty(propertiesFile, props, "apex.shema", apexShema);
-        }
-
-        dbHost = props.getProperty("database.host");
-        if (dbHost == null) {
-            System.out.println("Enter the Database host");
-            dbHost = consReader.readLine();
-            SetProperty(propertiesFile, props, "database.host", dbHost);
-        }
-
-        dbPort = props.getProperty("database.port");
-        if (dbPort == null) {
-            System.out.println("Enter the Database port");
-            dbPort = consReader.readLine();
-            SetProperty(propertiesFile, props, "database.port", dbPort);
-        }
-
-        dbServiceName = props.getProperty("database.servicename");
-        if (dbServiceName == null) {
-            System.out.println("Enter the Database service name");
-            dbServiceName = consReader.readLine();
-            SetProperty(propertiesFile, props, "database.servicename", dbServiceName);
-        }
-
-        dbUser = props.getProperty("database.user");
-        if (dbUser == null) {
-            System.out.println("Enter the Database user name");
-            dbUser = consReader.readLine();
-            SetProperty(propertiesFile, props, "database.user", dbUser);
-        }
-
-        String encryptedPassword = props.getProperty("database.password");
-        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-        textEncryptor.setPassword(secretKey);
-        if (encryptedPassword == null) {
-            System.out.println("Enter the password to connect to the database");
-            dbPassword = consReader.readLine();
-             encryptedPassword = textEncryptor.encrypt(dbPassword);
-            SetProperty(propertiesFile, props, "database.password", encryptedPassword);
-        } else {
-
-             dbPassword = textEncryptor.decrypt(encryptedPassword);
-        }
-
-        String intervalSecStr = props.getProperty("util.interval");
         if (intervalSecStr == null) {
             intervalSec = 5;
-            SetProperty(propertiesFile, props, "util.interval", intervalSec.toString());
         } else {
-
             intervalSec = Integer.valueOf(intervalSecStr);
         }
+        
         lockId = props.getProperty("util.lockId");
         if (lockId == null) {
             lockId = "0";
-            SetProperty(propertiesFile, props, "util.lockId", lockId);
+            SetProperty( "util.lockId", lockId);
         }
         System.out.println("Start lockID: " + lockId);
 
@@ -186,7 +122,15 @@ public class App {
 
                         String fileName = "./f" + appId + "/application/pages/page_" + String.format("%05d", pageId)
                                 + ".sql";
-                        FileWriter fileWriter = new FileWriter(fileName);
+                                FileWriter fileWriter;
+                                try {
+                            fileWriter = new FileWriter(fileName);
+                            
+                        } catch (Exception e) {
+                            System.out.println("The files of the exported application (application "+appId+ ") were not found! Please export the application from apex (zip) and unpack it into the current directory.");
+                            System.out.println("The new version of the page will be written in " + fileName);
+                            return;
+                        }
                         PrintWriter printWriter = new PrintWriter(fileWriter);
 
                         printWriter.print(pageScript);
@@ -197,7 +141,7 @@ public class App {
                     st.close();
 
                     if (lockId != null) {
-                        SetProperty(propertiesFile, props, "util.lockId", lockId);
+                        SetProperty("util.lockId", lockId);
                     }
 
                     st = conn.prepareStatement(selectPageChanges);
