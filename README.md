@@ -27,7 +27,7 @@ The parameters can be changed in the config.properties file. If you need to rein
 ## Test
 Clone git repo
 
-Run
+Run (Java needed)
 ``` 
 java -jar apxversion.jar
 ```
@@ -39,4 +39,4 @@ https://test.apex.rest:8443/ords
 - User: test
 - Password: Pi31415
 
-Lock page, change page an unlock :)
+Lock page, change page and unlock :)
