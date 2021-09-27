@@ -16,4 +16,10 @@ Permanently saving the page file (PL / SQL) and applying version control techniq
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/060cchJqN4I/0.jpg)](https://www.youtube.com/watch?v=060cchJqN4I)
 
 ## Install
-apxversion.jar
+
+Copy the jar file to your project directory and run the command
+``` 
+java -jar apxversion.jar
+```
+At the first start, you must specify the parameters necessary for the utility to work.
+The parameters can be changed in the config.properties file. If you need to reinstall the settings, simply delete the config.properties file.
