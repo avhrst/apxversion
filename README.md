@@ -26,6 +26,7 @@ The parameters can be changed in the config.properties file. If you need to rein
 
 ## Test
 Clone git repo
+
 Run
 ``` 
 java -jar apxversion.jar
