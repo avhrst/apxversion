@@ -11,7 +11,7 @@ import org.jasypt.util.text.BasicTextEncryptor;
 
 public class Util {
 
-  static File propertiesFile = new File("config.properties");
+  static File propertiesFile = new File("../config.properties");
   static Properties props = new Properties();
 
   static String secretKey = "PI31415926";

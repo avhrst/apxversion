@@ -24,19 +24,3 @@ java -jar apxversion.jar
 At the first start, you must specify the parameters necessary for the utility to work.
 The parameters can be changed in the config.properties file. If you need to reinstall the settings, simply delete the config.properties file.
 
-## Test
-Clone git repo
-
-Run (Java needed)
-``` 
-java -jar apxversion.jar
-```
-Open APEX IDE
-
-https://test.apex.rest:8443/ords
-
-- Workspace: vcontrol
-- User: test
-- Password: Pi31415
-
-Lock page, change page and unlock :)
