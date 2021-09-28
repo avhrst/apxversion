@@ -1,0 +1,5 @@
+# Package Files 
+*.jar
+
+# config 
+config.properties
