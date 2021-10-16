@@ -15,12 +15,11 @@ wwv_flow_api.create_page(
  p_id=>0
 ,p_user_interface_id=>wwv_flow_api.id(26251251977397106)
 ,p_name=>'Global Page - Desktop'
-,p_step_title=>'Global Page - Desktop'
+,p_alias=>'1'
 ,p_autocomplete_on_off=>'OFF'
-,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'D'
 ,p_last_updated_by=>'TEST'
-,p_last_upd_yyyymmddhh24miss=>'20211001085230'
+,p_last_upd_yyyymmddhh24miss=>'20211006141902'
 );
 wwv_flow_api.component_end;
 end;

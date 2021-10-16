@@ -1,18 +1,9 @@
-prompt --application/set_environment
-set define off verify off feedback off
-whenever sqlerror exit sql.sqlcode rollback
---------------------------------------------------------------------------------
---
--- ORACLE Application Express (APEX) export file
---
--- You should run the script connected to SQL*Plus as the Oracle user
--- APEX_210100 or as the owner (parsing schema) of the application.
---
--- NOTE: Calls to apex_application_install override the defaults below.
---
---------------------------------------------------------------------------------
+prompt --application/pages/page_00004
 begin
-wwv_flow_api.import_begin (
+--   Manifest
+--     PAGE: 00004
+--   Manifest End
+wwv_flow_api.component_begin (
  p_version_yyyy_mm_dd=>'2021.04.15'
 ,p_release=>'21.1.0'
 ,p_default_workspace_id=>4200481731648079
@@ -20,48 +11,18 @@ wwv_flow_api.import_begin (
 ,p_default_id_offset=>0
 ,p_default_owner=>'VCONTROL'
 );
-end;
-/
- 
-prompt APPLICATION 100 - App1
---
--- Application Export:
---   Application:     100
---   Name:            App1
---   Exported By:     SYSTEM
---   Flashback:       0
---   Export Type:     Page Export
---   Manifest
---     PAGE: 1
---   Manifest End
---   Version:         21.1.0
---   Instance ID:     1000155761403694
---
-
-begin
-null;
-end;
-/
-prompt --application/pages/delete_00001
-begin
-wwv_flow_api.remove_page (p_flow_id=>wwv_flow.g_flow_id, p_page_id=>1);
-end;
-/
-prompt --application/pages/page_00001
-begin
 wwv_flow_api.create_page(
- p_id=>1
+ p_id=>4
 ,p_user_interface_id=>wwv_flow_api.id(26251251977397106)
-,p_name=>'Home 2'
-,p_alias=>'HOME'
-,p_step_title=>'App1'
+,p_name=>'2'
+,p_alias=>'2'
+,p_step_title=>'2'
 ,p_autocomplete_on_off=>'OFF'
 ,p_page_template_options=>'#DEFAULT#'
-,p_last_updated_by=>'TEST'
-,p_last_upd_yyyymmddhh24miss=>'20211017002227'
+,p_last_upd_yyyymmddhh24miss=>'20211005161948'
 );
 wwv_flow_api.create_page_plug(
- p_id=>wwv_flow_api.id(26262013095397178)
+ p_id=>wwv_flow_api.id(55262440178037740)
 ,p_plug_name=>'App16'
 ,p_icon_css_classes=>'app-icon'
 ,p_region_template_options=>'#DEFAULT#'
@@ -75,7 +36,7 @@ wwv_flow_api.create_page_plug(
 ,p_attribute_03=>'Y'
 );
 wwv_flow_api.create_page_plug(
- p_id=>wwv_flow_api.id(26300783091446901)
+ p_id=>wwv_flow_api.id(55301210174087463)
 ,p_plug_name=>'Title 1'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_api.id(26161693516397044)
@@ -87,22 +48,21 @@ wwv_flow_api.create_page_plug(
 ,p_attribute_02=>'HTML'
 );
 wwv_flow_api.create_page_plug(
- p_id=>wwv_flow_api.id(53155807493551042)
-,p_plug_name=>'App2'
+ p_id=>wwv_flow_api.id(82156234576191604)
+,p_plug_name=>'App1'
 ,p_icon_css_classes=>'app-icon'
 ,p_region_template_options=>'#DEFAULT#'
 ,p_plug_template=>wwv_flow_api.id(26160372005397043)
 ,p_plug_display_sequence=>20
 ,p_plug_display_point=>'BODY'
-,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'TEXT'
 ,p_attribute_03=>'Y'
 );
 wwv_flow_api.create_page_plug(
- p_id=>wwv_flow_api.id(53160397457551055)
+ p_id=>wwv_flow_api.id(82160824540191617)
 ,p_plug_name=>'Language Selector'
-,p_parent_plug_id=>wwv_flow_api.id(53155807493551042)
+,p_parent_plug_id=>wwv_flow_api.id(82156234576191604)
 ,p_region_template_options=>'#DEFAULT#'
 ,p_component_template_options=>'#DEFAULT#'
 ,p_escape_on_http_output=>'Y'
@@ -114,7 +74,7 @@ wwv_flow_api.create_page_plug(
 ,p_plug_query_num_rows=>15
 );
 wwv_flow_api.create_page_plug(
- p_id=>wwv_flow_api.id(54355429050218718)
+ p_id=>wwv_flow_api.id(83355856132859280)
 ,p_plug_name=>'App1'
 ,p_icon_css_classes=>'app-icon'
 ,p_region_template_options=>'#DEFAULT#'
@@ -126,9 +86,9 @@ wwv_flow_api.create_page_plug(
 ,p_attribute_03=>'Y'
 );
 wwv_flow_api.create_page_plug(
- p_id=>wwv_flow_api.id(54360019014218731)
+ p_id=>wwv_flow_api.id(83360446096859293)
 ,p_plug_name=>'Language Selector'
-,p_parent_plug_id=>wwv_flow_api.id(54355429050218718)
+,p_parent_plug_id=>wwv_flow_api.id(83355856132859280)
 ,p_region_template_options=>'#DEFAULT#'
 ,p_component_template_options=>'#DEFAULT#'
 ,p_escape_on_http_output=>'Y'
@@ -139,23 +99,10 @@ wwv_flow_api.create_page_plug(
 ,p_plug_source_type=>'NATIVE_PLSQL'
 ,p_plug_query_num_rows=>15
 );
-wwv_flow_api.create_page_plug(
- p_id=>wwv_flow_api.id(83960566451781936)
-,p_plug_name=>'Language Selector'
-,p_region_template_options=>'#DEFAULT#'
-,p_component_template_options=>'#DEFAULT#'
-,p_escape_on_http_output=>'Y'
-,p_plug_template=>wwv_flow_api.id(26130673274397033)
-,p_plug_display_sequence=>40
-,p_plug_display_point=>'BODY'
-,p_plug_source=>'apex_lang.emit_language_selector_list;'
-,p_plug_source_type=>'NATIVE_PLSQL'
-,p_plug_query_num_rows=>15
-);
 wwv_flow_api.create_page_button(
- p_id=>wwv_flow_api.id(26900715137153921)
+ p_id=>wwv_flow_api.id(29001358211640613)
 ,p_button_sequence=>40
-,p_button_plug_id=>wwv_flow_api.id(53155807493551042)
+,p_button_plug_id=>wwv_flow_api.id(83355856132859280)
 ,p_button_name=>'LOGIN'
 ,p_button_action=>'SUBMIT'
 ,p_button_template_options=>'#DEFAULT#'
@@ -168,9 +115,9 @@ wwv_flow_api.create_page_button(
 ,p_grid_new_column=>'Y'
 );
 wwv_flow_api.create_page_button(
- p_id=>wwv_flow_api.id(28100471171821596)
+ p_id=>wwv_flow_api.id(29004376565640622)
 ,p_button_sequence=>40
-,p_button_plug_id=>wwv_flow_api.id(54355429050218718)
+,p_button_plug_id=>wwv_flow_api.id(82156234576191604)
 ,p_button_name=>'LOGIN'
 ,p_button_action=>'SUBMIT'
 ,p_button_template_options=>'#DEFAULT#'
@@ -183,10 +130,10 @@ wwv_flow_api.create_page_button(
 ,p_grid_new_column=>'Y'
 );
 wwv_flow_api.create_page_item(
- p_id=>wwv_flow_api.id(26901140991153927)
-,p_name=>'P1_USERNAME'
+ p_id=>wwv_flow_api.id(29001760743640615)
+,p_name=>'P4_USERNAME_1'
 ,p_item_sequence=>10
-,p_item_plug_id=>wwv_flow_api.id(53155807493551042)
+,p_item_plug_id=>wwv_flow_api.id(83355856132859280)
 ,p_prompt=>'Username'
 ,p_placeholder=>'Username'
 ,p_display_as=>'NATIVE_TEXT_FIELD'
@@ -204,10 +151,10 @@ wwv_flow_api.create_page_item(
 ,p_attribute_05=>'NONE'
 );
 wwv_flow_api.create_page_item(
- p_id=>wwv_flow_api.id(26901532005153932)
-,p_name=>'P1_PASSWORD'
+ p_id=>wwv_flow_api.id(29002143266640618)
+,p_name=>'P4_PASSWORD_1'
 ,p_item_sequence=>20
-,p_item_plug_id=>wwv_flow_api.id(53155807493551042)
+,p_item_plug_id=>wwv_flow_api.id(83355856132859280)
 ,p_prompt=>'Password'
 ,p_placeholder=>'Password'
 ,p_display_as=>'NATIVE_PASSWORD'
@@ -221,10 +168,10 @@ wwv_flow_api.create_page_item(
 ,p_attribute_01=>'Y'
 );
 wwv_flow_api.create_page_item(
- p_id=>wwv_flow_api.id(26901961318153932)
-,p_name=>'P1_REMEMBER'
+ p_id=>wwv_flow_api.id(29002517442640618)
+,p_name=>'P4_REMEMBER_1'
 ,p_item_sequence=>30
-,p_item_plug_id=>wwv_flow_api.id(53155807493551042)
+,p_item_plug_id=>wwv_flow_api.id(83355856132859280)
 ,p_prompt=>'Remember username'
 ,p_display_as=>'NATIVE_CHECKBOX'
 ,p_named_lov=>'LOGIN_REMEMBER_USERNAME'
@@ -251,10 +198,10 @@ wwv_flow_api.create_page_item(
 ,p_attribute_01=>'1'
 );
 wwv_flow_api.create_page_item(
- p_id=>wwv_flow_api.id(28100816066821600)
-,p_name=>'P1_USERNAME_1'
+ p_id=>wwv_flow_api.id(29004781937640623)
+,p_name=>'P4_USERNAME'
 ,p_item_sequence=>10
-,p_item_plug_id=>wwv_flow_api.id(54355429050218718)
+,p_item_plug_id=>wwv_flow_api.id(82156234576191604)
 ,p_prompt=>'Username'
 ,p_placeholder=>'Username'
 ,p_display_as=>'NATIVE_TEXT_FIELD'
@@ -272,10 +219,10 @@ wwv_flow_api.create_page_item(
 ,p_attribute_05=>'NONE'
 );
 wwv_flow_api.create_page_item(
- p_id=>wwv_flow_api.id(28101274228821604)
-,p_name=>'P1_PASSWORD_1'
+ p_id=>wwv_flow_api.id(29005128509640623)
+,p_name=>'P4_PASSWORD'
 ,p_item_sequence=>20
-,p_item_plug_id=>wwv_flow_api.id(54355429050218718)
+,p_item_plug_id=>wwv_flow_api.id(82156234576191604)
 ,p_prompt=>'Password'
 ,p_placeholder=>'Password'
 ,p_display_as=>'NATIVE_PASSWORD'
@@ -289,10 +236,10 @@ wwv_flow_api.create_page_item(
 ,p_attribute_01=>'Y'
 );
 wwv_flow_api.create_page_item(
- p_id=>wwv_flow_api.id(28101695757821604)
-,p_name=>'P1_REMEMBER_1'
+ p_id=>wwv_flow_api.id(29005578320640623)
+,p_name=>'P4_REMEMBER'
 ,p_item_sequence=>30
-,p_item_plug_id=>wwv_flow_api.id(54355429050218718)
+,p_item_plug_id=>wwv_flow_api.id(82156234576191604)
 ,p_prompt=>'Remember username'
 ,p_display_as=>'NATIVE_CHECKBOX'
 ,p_named_lov=>'LOGIN_REMEMBER_USERNAME'
@@ -318,13 +265,6 @@ wwv_flow_api.create_page_item(
 '</p>'))
 ,p_attribute_01=>'1'
 );
+wwv_flow_api.component_end;
 end;
 /
-prompt --application/end_environment
-begin
-wwv_flow_api.import_end(p_auto_install_sup_obj => nvl(wwv_flow_application_install.get_auto_install_sup_obj, false));
-commit;
-end;
-/
-set verify on feedback on define on
-prompt  ...done

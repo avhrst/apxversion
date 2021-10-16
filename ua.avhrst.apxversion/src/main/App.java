@@ -9,9 +9,9 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.*;
 
-
 public class App {
     static String lockId;
+    static String changeId;
     static String branchName;
     static String appUser;
     static String appWorkspace;
@@ -35,28 +35,43 @@ public class App {
             Util.NewPropertyFile();
         }
 
-        appUser =  GetPropertyValue("apex.user","Enter the APEX user, this should be the developer's login",consReader);
-        appWorkspace =  GetPropertyValue("apex.workspace","Enter the name of the APEX workspace you want to monitor",consReader);
-        apexShema =  GetPropertyValue("apex.shema","Enter shema name where APEX is installed (APEX_XXXXXX)",consReader);
-        dbHost =  GetPropertyValue("database.host","Enter the host where the database is installed",consReader);
-        dbPort =  GetPropertyValue("database.port","Enter the port the database is using",consReader);
-        dbServiceName =  GetPropertyValue("database.servicename","Enter the Database service name",consReader);
-        dbUser =  GetPropertyValue("database.user","Enter the name of the database user who has read and write privileges to the APEX_" + apexShema  + "  schema. (It could be SYSTEM) ",consReader);
-        dbPassword = GetPasswordProperty("database.password","Enter the password to connect to the database",consReader);
-        String intervalSecStr  =  GetPropertyValue("util.interval","Set the refresh interval in seconds (Recommended value - 5 sec)",consReader);
+        appUser = GetPropertyValue("apex.user", "Enter the APEX user, this should be the developer's login",
+                consReader);
+        appWorkspace = GetPropertyValue("apex.workspace", "Enter the name of the APEX workspace you want to monitor",
+                consReader);
+        apexShema = GetPropertyValue("apex.shema", "Enter shema name where APEX is installed (APEX_XXXXXX)",
+                consReader);
+        dbHost = GetPropertyValue("database.host", "Enter the host where the database is installed", consReader);
+        dbPort = GetPropertyValue("database.port", "Enter the port the database is using", consReader);
+        dbServiceName = GetPropertyValue("database.servicename", "Enter the Database service name", consReader);
+        dbUser = GetPropertyValue("database.user",
+                "Enter the name of the database user who has read and write privileges to the APEX_" + apexShema
+                        + "  schema. (It could be SYSTEM) ",
+                consReader);
+        dbPassword = GetPasswordProperty("database.password", "Enter the password to connect to the database",
+                consReader);
+        String intervalSecStr = GetPropertyValue("util.interval",
+                "Set the refresh interval in seconds (Recommended value - 5 sec)", consReader);
 
         if (intervalSecStr == null) {
             intervalSec = 5;
         } else {
             intervalSec = Integer.valueOf(intervalSecStr);
         }
-        
+
         lockId = props.getProperty("util.lockId");
         if (lockId == null) {
             lockId = "0";
-            SetProperty( "util.lockId", lockId);
+            SetProperty("util.lockId", lockId);
         }
         System.out.println("Start lockID: " + lockId);
+
+        changeId = props.getProperty("util.ghangeId");
+        if (changeId == null) {
+            changeId = "0";
+            SetProperty("util.ghangeId", changeId);
+        }
+        System.out.println("Start ghangeID: " + changeId);
 
         // load driver
         Class.forName("oracle.jdbc.OracleDriver");
@@ -74,7 +89,7 @@ public class App {
                 + ") and action = 'UNLOCK' order by lock_id";
 
         String exportPageScript = "DECLARE v_files  apex_t_export_files; v_components  apex_t_varchar2 := apex_t_varchar2(); "
-                + "BEGIN  v_components.extend(1); v_components(1) := 'PAGE:' || :page_id; "
+                + "BEGIN  v_components.extend(1); v_components(1) :=  :object_name; "
                 + "v_files := apex_export.get_application(p_application_id => :app_id, p_components => v_components); "
                 + ":page_script := v_files(1).contents; END;";
 
@@ -92,6 +107,12 @@ public class App {
                 + "values(:app_id,:page_id,:app_user,sysdate,:workspace_id); commit; "
                 + "exception when others then null; end;";
 
+        String selectSharedCanges = "select s.id change_id,s.flow_id app_id,object_name,s.flow_table,s.flow_table_pk object_id  FROM "
+                + apexShema + ".wwv_flow_builder_audit_trail s join " + apexShema
+                + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
+                + "where s.flow_table in ('WWV_FLOW_LISTS_OF_VALUES$') and s.flow_user = ? and f.workspace = ? "
+                + "and s.id > ? order by s.audit_date desc";
+
         java.util.TimerTask task = new java.util.TimerTask() {
             @Override
             public void run() {
@@ -101,6 +122,7 @@ public class App {
                     CallableStatement cs;
                     ResultSet rs;
 
+                    // --- select locked pages ---
                     st = conn.prepareStatement(selectLockedPages);
                     st.setString(1, appUser);
                     st.setString(2, lockId);
@@ -112,7 +134,7 @@ public class App {
                         lockId = rs.getString("LOCK_ID");
 
                         cs = conn.prepareCall(exportPageScript);
-                        cs.setInt("page_id", pageId);
+                        cs.setString("object_name", "PAGE:" + pageId);
                         cs.setInt("app_id", appId);
                         cs.registerOutParameter("page_script", Types.CLOB);
 
@@ -122,12 +144,13 @@ public class App {
 
                         String fileName = "./f" + appId + "/application/pages/page_" + String.format("%05d", pageId)
                                 + ".sql";
-                                FileWriter fileWriter;
-                                try {
+                        FileWriter fileWriter;
+                        try {
                             fileWriter = new FileWriter(fileName);
-                            
+
                         } catch (Exception e) {
-                            System.out.println("The files of the exported application (application "+appId+ ") were not found! Please export the application from apex (zip) and unpack it into the current directory.");
+                            System.out.println("The files of the exported application (application " + appId
+                                    + ") were not found! Please export the application from apex (zip) and unpack it into the current directory.");
                             System.out.println("The new version of the page will be written in " + fileName);
                             return;
                         }
@@ -144,6 +167,61 @@ public class App {
                         SetProperty("util.lockId", lockId);
                     }
 
+                    // --- select changed shared ---
+                    st = conn.prepareStatement(selectSharedCanges);
+                    st.setString(1, appUser);
+                    st.setString(2, appWorkspace);
+                    st.setString(3, changeId);
+
+                    rs = st.executeQuery();
+                    while (rs.next()) {
+                        Integer appId = rs.getInt("APP_ID");
+                        String objectName = rs.getString("OBJECT_NAME");
+                        String objectId = rs.getString("OBJECT_ID");
+                        changeId = rs.getString("CHANGE_ID");
+                        String flowTable = rs.getString("FLOW_TABLE");
+
+                        cs = conn.prepareCall(exportPageScript);
+                        if (flowTable.equals("WWV_FLOW_LISTS_OF_VALUES$")) {
+                            cs.setString("object_name", "LOV:" + objectId);
+                        }
+                        cs.setInt("app_id", appId);
+                        cs.registerOutParameter("page_script", Types.CLOB);
+
+                        cs.execute();
+                        String pageScript = cs.getString("page_script");
+                        cs.close();
+
+                        String fileName = objectName.toLowerCase() + ".sql";
+
+                        if (flowTable.equals("WWV_FLOW_LISTS_OF_VALUES$")) {
+                            fileName = "./f" + appId + "/application/shared_components/user_interface/lovs/"
+                                    + objectName.toLowerCase() + ".sql";
+                        }
+                        FileWriter fileWriter;
+                        try {
+                            fileWriter = new FileWriter(fileName);
+
+                        } catch (Exception e) {
+                            System.out.println("The files of the exported application (application " + appId
+                                    + ") were not found! Please export the application from apex (zip) and unpack it into the current directory.");
+                            System.out.println("The new version of the page will be written in " + fileName);
+                            return;
+                        }
+                        PrintWriter printWriter = new PrintWriter(fileWriter);
+
+                        printWriter.print(pageScript);
+                        printWriter.close();
+                        System.out.println("Loaded file: " + fileName);
+                    }
+                    rs.close();
+                    st.close();
+
+                    if (lockId != null) {
+                        SetProperty("util.changeId", changeId);
+                    }
+
+                    // -- select changed pages --
                     st = conn.prepareStatement(selectPageChanges);
                     st.setString(1, appUser);
                     st.setString(2, appWorkspace);
