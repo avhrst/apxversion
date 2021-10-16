@@ -66,12 +66,12 @@ public class App {
         }
         System.out.println("Start lockID: " + lockId);
 
-        changeId = props.getProperty("util.ghangeId");
+        changeId = props.getProperty("util.changeId");
         if (changeId == null) {
             changeId = "0";
-            SetProperty("util.ghangeId", changeId);
+            SetProperty("util.changeId", changeId);
         }
-        System.out.println("Start ghangeID: " + changeId);
+        System.out.println("Start changeID: " + changeId);
 
         // load driver
         Class.forName("oracle.jdbc.OracleDriver");
