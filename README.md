@@ -1,6 +1,11 @@
 # Oracle APEX version control tool
 The utility is designed to implement version control of APEX application pages.
 
+
+## 1.1 update - support LOV versioning
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/oqcI-fjBfIY/0.jpg)](https://www.youtube.com/watch?v=oqcI-fjBfIY)
+
+
 ## How it works
  - The developer exports the application (zip archive) and unpacks it to a directory that is connected to the version control system.
  - Runs the utility in the root of this directory.
@@ -13,7 +18,7 @@ Permanently saving the page file (PL / SQL) and applying version control techniq
 
 ## Demo
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/060cchJqN4I/0.jpg)](https://www.youtube.com/watch?v=060cchJqN4I)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/JBrtDeZcNE4/0.jpg)](https://www.youtube.com/watch?v=JBrtDeZcNE4)
 
 ## Install
 
