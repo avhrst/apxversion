@@ -58,21 +58,43 @@ wwv_flow_api.create_page(
 ,p_autocomplete_on_off=>'OFF'
 ,p_page_template_options=>'#DEFAULT#'
 ,p_last_updated_by=>'TEST'
-,p_last_upd_yyyymmddhh24miss=>'20211001085231'
+,p_last_upd_yyyymmddhh24miss=>'20211001160538'
 );
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(26262013095397178)
-,p_plug_name=>'App1'
+,p_plug_name=>'App1 3'
 ,p_icon_css_classes=>'app-icon'
 ,p_region_template_options=>'#DEFAULT#'
-,p_escape_on_http_output=>'Y'
 ,p_plug_template=>wwv_flow_api.id(26151858071397040)
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'REGION_POSITION_01'
 ,p_plug_query_num_rows=>15
+,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 ,p_attribute_03=>'Y'
+);
+<<<<<<< HEAD
+end;
+/
+prompt --application/end_environment
+begin
+wwv_flow_api.import_end(p_auto_install_sup_obj => nvl(wwv_flow_application_install.get_auto_install_sup_obj, false));
+commit;
+end;
+/
+=======
+wwv_flow_api.create_page_plug(
+ p_id=>wwv_flow_api.id(26300783091446901)
+,p_plug_name=>'Title 1'
+,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
+,p_plug_template=>wwv_flow_api.id(26161693516397044)
+,p_plug_display_sequence=>10
+,p_include_in_reg_disp_sel_yn=>'Y'
+,p_plug_display_point=>'BODY'
+,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
 );
 end;
 /
@@ -82,5 +104,6 @@ wwv_flow_api.import_end(p_auto_install_sup_obj => nvl(wwv_flow_application_insta
 commit;
 end;
 /
+>>>>>>> df0348b58692ce608534898b3360429ed3b7be71
 set verify on feedback on define on
 prompt  ...done
