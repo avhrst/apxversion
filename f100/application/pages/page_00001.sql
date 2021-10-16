@@ -75,6 +75,7 @@ wwv_flow_api.create_page_plug(
 ,p_attribute_03=>'Y'
 );
 <<<<<<< HEAD
+<<<<<<< HEAD
 end;
 /
 prompt --application/end_environment
@@ -84,6 +85,8 @@ commit;
 end;
 /
 =======
+=======
+>>>>>>> df0348b58692ce608534898b3360429ed3b7be71
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(26300783091446901)
 ,p_plug_name=>'Title 1'
@@ -104,6 +107,9 @@ wwv_flow_api.import_end(p_auto_install_sup_obj => nvl(wwv_flow_application_insta
 commit;
 end;
 /
+<<<<<<< HEAD
+>>>>>>> df0348b58692ce608534898b3360429ed3b7be71
+=======
 >>>>>>> df0348b58692ce608534898b3360429ed3b7be71
 set verify on feedback on define on
 prompt  ...done
