@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import java.sql.*;
 
 public class App {
@@ -58,14 +57,6 @@ public class App {
             intervalSec = Integer.valueOf(intervalSecStr);
         }
 
-    
-        changeId = props.getProperty("util.changeId");
-        if (changeId == null) {
-            changeId = "0";
-            SetProperty("util.changeId", changeId);
-        }
-        System.out.println("Start changeID: " + changeId);
-
         // load driver
         Class.forName("oracle.jdbc.OracleDriver");
         System.out.println("Oracle JDBC driver loaded ok.");
@@ -73,6 +64,10 @@ public class App {
                 "jdbc:oracle:thin:" + dbUser + "/" + dbPassword + "@" + dbHost + ":" + dbPort + "/" + dbServiceName);
         System.out.println("Connected to DB");
         // ------------------------------------------------------------------------------------------------------------------
+
+        String lastChangeId = "select max(s.id) change_id "
+                + "from apex_210100.wwv_flow_builder_audit_trail s join apex_210100.wwv_flow_authorized f ON s.flow_id = f.application_id "
+                + "where s.flow_user = ? and f.workspace = ?";
 
         String exportScript = "DECLARE v_files  apex_t_export_files; v_components  apex_t_varchar2 := apex_t_varchar2(); "
                 + "BEGIN  v_components.extend(1); v_components(1) :=  :object_name; "
@@ -86,14 +81,12 @@ public class App {
                 + "where s.flow_table in ('WWV_FLOW_LISTS_OF_VALUES$','WWV_FLOW_STEPS') "
                 + "and s.flow_user = ? and f.workspace = ? and id > ? and "
                 + "s.flow_table_pk not in (select object_id from apex_210100.wwv_flow_lock_page where flow_id = s.flow_id and locked_by = s.flow_user)"
-                + "order by s.audit_date desc) " 
-                + "select distinct "
-                + "max(change_id) over(partition by object_id) change_id, " 
+                + "order by s.audit_date desc) " + "select distinct "
+                + "max(change_id) over(partition by object_id) change_id, "
                 + "max(app_id) over(partition by object_id) app_id, "
                 + "max(object_name) over(partition by object_id) object_name, "
                 + "max(flow_table) over(partition by object_id) flow_table, "
-                + "max(object_id) over(partition by object_id) object_id "
-                + "from a where cnt = 1 order by 1 desc ";
+                + "max(object_id) over(partition by object_id) object_id " + "from a where cnt = 1 order by 1 desc ";
 
         java.util.TimerTask task = new java.util.TimerTask() {
             @Override
@@ -103,6 +96,22 @@ public class App {
                     PreparedStatement st;
                     CallableStatement cs;
                     ResultSet rs;
+
+                    // -- last change_id --
+
+                    if (changeId == null) {
+                        st = conn.prepareStatement(lastChangeId);
+                        st.setString(1, appUser);
+                        st.setString(2, appWorkspace);
+                        rs = st.executeQuery();
+                        while (rs.next()) {
+                            changeId = rs.getString("CHANGE_ID");
+                        }
+                        rs.close();
+                        st.close();
+                        System.out.println("Change ID: " + changeId);
+
+                    }
 
                     // --- select changes ---
                     st = conn.prepareStatement(selectChanges);
@@ -117,7 +126,7 @@ public class App {
                         String objectId = rs.getString("OBJECT_ID");
                         changeId = rs.getString("CHANGE_ID");
                         String flowTable = rs.getString("FLOW_TABLE");
-       
+
                         cs = conn.prepareCall(exportScript);
 
                         if (flowTable.equals("WWV_FLOW_STEPS")) {
@@ -138,8 +147,8 @@ public class App {
                         String fileName = objectName.toLowerCase() + ".sql";
 
                         if (flowTable.equals("WWV_FLOW_STEPS")) {
-                            fileName = "./f" + appId + "/application/pages/page_" + String.format("%05d", Integer.valueOf(objectId))
-                                    + ".sql";
+                            fileName = "./f" + appId + "/application/pages/page_"
+                                    + String.format("%05d", Integer.valueOf(objectId)) + ".sql";
                         }
 
                         if (flowTable.equals("WWV_FLOW_LISTS_OF_VALUES$")) {
@@ -165,10 +174,6 @@ public class App {
                     }
                     rs.close();
                     st.close();
-
-                    if (changeId != null) {
-                        SetProperty("util.changeId", changeId);
-                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
