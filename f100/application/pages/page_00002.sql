@@ -53,16 +53,17 @@ wwv_flow_api.create_page(
  p_id=>2
 ,p_user_interface_id=>wwv_flow_api.id(26251251977397106)
 ,p_name=>'222222'
-,p_alias=>'222222'
+,p_alias=>'222222EE'
 ,p_page_mode=>'MODAL'
-,p_step_title=>'222222'
+,p_step_title=>'222222ee'
 ,p_warn_on_unsaved_changes=>'N'
 ,p_first_item=>'AUTO_FIRST_ITEM'
 ,p_autocomplete_on_off=>'OFF'
+,p_group_id=>wwv_flow_api.id(26254499226397140)
 ,p_page_template_options=>'#DEFAULT#'
 ,p_page_is_public_y_n=>'Y'
 ,p_last_updated_by=>'TEST'
-,p_last_upd_yyyymmddhh24miss=>'20211017003046'
+,p_last_upd_yyyymmddhh24miss=>'20211019181114'
 );
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(54455785618223046)
@@ -85,6 +86,19 @@ wwv_flow_api.create_page_plug(
 ,p_escape_on_http_output=>'Y'
 ,p_plug_template=>wwv_flow_api.id(26130673274397033)
 ,p_plug_display_sequence=>20
+,p_plug_display_point=>'BODY'
+,p_plug_source=>'apex_lang.emit_language_selector_list;'
+,p_plug_source_type=>'NATIVE_PLSQL'
+,p_plug_query_num_rows=>15
+);
+wwv_flow_api.create_page_plug(
+ p_id=>wwv_flow_api.id(59260027322184526)
+,p_plug_name=>'Language Selector'
+,p_region_template_options=>'#DEFAULT#'
+,p_component_template_options=>'#DEFAULT#'
+,p_escape_on_http_output=>'Y'
+,p_plug_template=>wwv_flow_api.id(26130673274397033)
+,p_plug_display_sequence=>30
 ,p_plug_display_point=>'BODY'
 ,p_plug_source=>'apex_lang.emit_language_selector_list;'
 ,p_plug_source_type=>'NATIVE_PLSQL'

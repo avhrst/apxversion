@@ -54,7 +54,7 @@ wwv_flow_api.create_list_of_values(
 wwv_flow_api.create_static_lov_data(
  p_id=>wwv_flow_api.id(26256730022397161)
 ,p_lov_disp_sequence=>10
-,p_lov_disp_value=>'Remember username 2'
+,p_lov_disp_value=>'Remember username'
 ,p_lov_return_value=>'Y'
 );
 end;
