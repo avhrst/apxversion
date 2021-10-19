@@ -88,6 +88,7 @@ public class App {
                 + "max(flow_table) over(partition by object_id) flow_table, "
                 + "max(object_id) over(partition by object_id) object_id " + "from a where cnt = 1 order by 1 desc ";
 
+                System.out.println(selectChanges);
         java.util.TimerTask task = new java.util.TimerTask() {
             @Override
             public void run() {
