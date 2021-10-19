@@ -66,7 +66,7 @@ public class App {
         // ------------------------------------------------------------------------------------------------------------------
 
         String lastChangeId = "select max(s.id) change_id "
-                + "from apex_210100.wwv_flow_builder_audit_trail s join apex_210100.wwv_flow_authorized f ON s.flow_id = f.application_id "
+                + "from "+apexShema+".wwv_flow_builder_audit_trail s join "+apexShema+".wwv_flow_authorized f ON s.flow_id = f.application_id "
                 + "where s.flow_user = ? and f.workspace = ?";
 
         String exportScript = "DECLARE v_files  apex_t_export_files; v_components  apex_t_varchar2 := apex_t_varchar2(); "
@@ -80,7 +80,7 @@ public class App {
                 + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
                 + "where s.flow_table in ('WWV_FLOW_LISTS_OF_VALUES$','WWV_FLOW_STEPS') "
                 + "and s.flow_user = ? and f.workspace = ? and id > ? and "
-                + "s.flow_table_pk not in (select object_id from apex_210100.wwv_flow_lock_page where flow_id = s.flow_id and locked_by = s.flow_user)"
+                + "s.flow_table_pk not in (select object_id from "+apexShema+".wwv_flow_lock_page where flow_id = s.flow_id and locked_by = s.flow_user)"
                 + "order by s.audit_date desc) " + "select distinct "
                 + "max(change_id) over(partition by object_id) change_id, "
                 + "max(app_id) over(partition by object_id) app_id, "
