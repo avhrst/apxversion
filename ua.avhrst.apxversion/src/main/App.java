@@ -20,6 +20,7 @@ public class App {
     static String dbUser;
     static String dbPassword;
     static Integer intervalSec;
+    static String changeIdFormat = "'YYYYMMDDHH24MISS'";
 
     public static void main(String[] args) throws Exception {
 
@@ -57,6 +58,11 @@ public class App {
             intervalSec = Integer.valueOf(intervalSecStr);
         }
 
+        changeId = props.getProperty("util.changeId");
+        if (changeId != null) {
+            System.out.println("Change ID: " + changeId);
+        }
+
         // load driver
         Class.forName("oracle.jdbc.OracleDriver");
         System.out.println("Oracle JDBC driver loaded ok.");
@@ -65,8 +71,9 @@ public class App {
         System.out.println("Connected to DB");
         // ------------------------------------------------------------------------------------------------------------------
 
-        String lastChangeId = "select max(s.id) change_id "
-                + "from "+apexShema+".wwv_flow_builder_audit_trail s join "+apexShema+".wwv_flow_authorized f ON s.flow_id = f.application_id "
+        String lastChangeId = "select to_char(max(s.audit_date)," + changeIdFormat + ") change_id " + "from "
+                + apexShema + ".wwv_flow_builder_audit_trail s join " + apexShema
+                + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
                 + "where s.flow_user = ? and f.workspace = ?";
 
         String exportScript = "DECLARE v_files  apex_t_export_files; v_components  apex_t_varchar2 := apex_t_varchar2(); "
@@ -74,21 +81,33 @@ public class App {
                 + "v_files := apex_export.get_application(p_application_id => :app_id, p_components => v_components); "
                 + ":page_script := v_files(1).contents; END;";
 
+        String listOfFlowObject = "'WWV_FLOW_LISTS_OF_VALUES$','WWV_FLOW_STEPS'";
+
         String selectChanges = "with a as ( "
-                + "select s.id change_id,s.flow_id app_id,object_name,s.flow_table, s.flow_table_pk object_id, COUNT(s.id) OVER (PARTITION BY s.scn) cnt  FROM "
-                + apexShema + ".wwv_flow_builder_audit_trail s join " + apexShema
-                + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
-                + "where s.flow_table in ('WWV_FLOW_LISTS_OF_VALUES$','WWV_FLOW_STEPS') "
-                + "and s.flow_user = ? and f.workspace = ? and id > ? and "
-                + "s.flow_table_pk not in (select object_id from "+apexShema+".wwv_flow_lock_page where flow_id = s.flow_id and locked_by = s.flow_user)"
-                + "order by s.audit_date desc) " + "select distinct "
-                + "max(change_id) over(partition by object_id) change_id, "
+                + "select s.audit_date,s.flow_id app_id,object_name,s.flow_table, s.flow_table_pk object_id, "
+                + "s.SECURITY_GROUP_ID workspace_id,COUNT(s.id) OVER (PARTITION BY s.scn) cnt  FROM " + apexShema
+                + ".wwv_flow_builder_audit_trail s join " + apexShema
+                + ".wwv_flow_authorized f ON s.flow_id = f.application_id " + "where s.flow_table in ("
+                + listOfFlowObject + ") " + "and s.flow_user = ? and f.workspace = ? and s.audit_date > to_date(?,"
+                + changeIdFormat + ") and " + "s.flow_table_pk not in (select object_id from " + apexShema
+                + ".wwv_flow_lock_page where flow_id = s.flow_id and locked_by = s.flow_user)"
+                + "order by s.audit_date desc) " + "select a1.*, to_char(a1.audit_date," + changeIdFormat
+                + ") change_id, " + "(select count(*) from " + apexShema
+                + ".wwv_flow_lock_page_log where action_date > a1.audit_date - interval '1' second "
+                + "and ACTION = 'UNLOCK' and lock_flow = a1.app_id and lock_page = a1.object_id) is_unlock "
+                + "from (select distinct " + "max(audit_date) over(partition by object_id) audit_date, "
                 + "max(app_id) over(partition by object_id) app_id, "
                 + "max(object_name) over(partition by object_id) object_name, "
                 + "max(flow_table) over(partition by object_id) flow_table, "
-                + "max(object_id) over(partition by object_id) object_id " + "from a where cnt = 1 order by 1 desc ";
+                + "max(object_id) over(partition by object_id) object_id, "
+                + "max(workspace_id) over(partition by object_id) workspace_id "
+                + "from a where cnt = 1 order by 1 desc) a1 ";
 
-                System.out.println(selectChanges);
+        String lockPageScript = "begin insert into " + apexShema
+                + ".wwv_flow_lock_page(flow_id,object_id,locked_by,locked_on,security_group_id) "
+                + "values(:app_id,:page_id,:app_user,sysdate,:workspace_id); commit; "
+                + "exception when others then null; end;";
+
         java.util.TimerTask task = new java.util.TimerTask() {
             @Override
             public void run() {
@@ -96,6 +115,7 @@ public class App {
 
                     PreparedStatement st;
                     CallableStatement cs;
+                    CallableStatement cs2;
                     ResultSet rs;
 
                     // -- last change_id --
@@ -111,7 +131,6 @@ public class App {
                         rs.close();
                         st.close();
                         System.out.println("Change ID: " + changeId);
-
                     }
 
                     // --- select changes ---
@@ -127,11 +146,26 @@ public class App {
                         String objectId = rs.getString("OBJECT_ID");
                         changeId = rs.getString("CHANGE_ID");
                         String flowTable = rs.getString("FLOW_TABLE");
-
+                        String workspaceId = rs.getString("WORKSPACE_ID");
+                        int isUnlock = rs.getInt("IS_UNLOCK");
                         cs = conn.prepareCall(exportScript);
 
                         if (flowTable.equals("WWV_FLOW_STEPS")) {
                             cs.setString("object_name", "PAGE:" + objectId);
+
+                            if (isUnlock == 0) {
+                                System.out.println(
+                                        "Unblocked page found. " + "Application " + appId + ", page " + objectId);
+
+                                cs2 = conn.prepareCall(lockPageScript);
+                                cs2.setString(":app_id", appId);
+                                cs2.setString(":page_id", objectId);
+                                cs2.setString(":app_user", appUser);
+                                cs2.setString(":workspace_id", workspaceId);
+                                cs2.execute();
+                                cs2.close();
+                                System.out.println("Application " + appId + ", page " + objectId + " locked");
+                            }
                         }
 
                         if (flowTable.equals("WWV_FLOW_LISTS_OF_VALUES$")) {
@@ -176,6 +210,9 @@ public class App {
                     rs.close();
                     st.close();
 
+                    if (changeId != null) {
+                        SetProperty("util.changeId", changeId);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
