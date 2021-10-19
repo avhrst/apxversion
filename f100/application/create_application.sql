@@ -49,7 +49,7 @@ wwv_flow_api.create_flow(
 ,p_substitution_string_01=>'APP_NAME'
 ,p_substitution_value_01=>'App1'
 ,p_last_updated_by=>'TEST'
-,p_last_upd_yyyymmddhh24miss=>'20211016200625'
+,p_last_upd_yyyymmddhh24miss=>'20211018085905'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>3
 ,p_ui_type_name => null
