@@ -81,14 +81,13 @@ public class App {
                 + "v_files := apex_export.get_application(p_application_id => :app_id, p_components => v_components); "
                 + ":page_script := v_files(1).contents; END;";
 
-        String listOfFlowObject = "'WWV_FLOW_LISTS_OF_VALUES$','WWV_FLOW_STEPS'";
-
+       
         String selectChanges = "with a as ( "
                 + "select s.audit_date,s.flow_id app_id,object_name,s.flow_table, s.flow_table_pk object_id, "
                 + "s.SECURITY_GROUP_ID workspace_id,COUNT(s.id) OVER (PARTITION BY s.scn) cnt  FROM " + apexShema
                 + ".wwv_flow_builder_audit_trail s join " + apexShema
                 + ".wwv_flow_authorized f ON s.flow_id = f.application_id " + "where s.flow_table in ("
-                + listOfFlowObject + ") " + "and s.flow_user = ? and f.workspace = ? and s.audit_date > to_date(?,"
+                + Apex.listOfFlowObject + ") " + "and s.flow_user = ? and f.workspace = ? and s.audit_date > to_date(?,"
                 + changeIdFormat + ") and " + "s.flow_table_pk not in (select object_id from " + apexShema
                 + ".wwv_flow_lock_page where flow_id = s.flow_id and locked_by = s.flow_user)"
                 + "order by s.audit_date desc) " + "select a1.*, to_char(a1.audit_date," + changeIdFormat
@@ -150,9 +149,10 @@ public class App {
                         int isUnlock = rs.getInt("IS_UNLOCK");
                         cs = conn.prepareCall(exportScript);
 
-                        if (flowTable.equals("WWV_FLOW_STEPS")) {
-                            cs.setString("object_name", "PAGE:" + objectId);
 
+                        cs.setString("object_name",Apex.getObjectName(flowTable, objectId)); 
+
+                        if (flowTable.equals("WWV_FLOW_STEPS")) {
                             if (isUnlock == 0) {
                                 System.out.println(
                                         "Unblocked page found. " + "Application " + appId + ", page " + objectId);
@@ -167,11 +167,6 @@ public class App {
                                 System.out.println("Application " + appId + ", page " + objectId + " locked");
                             }
                         }
-
-                        if (flowTable.equals("WWV_FLOW_LISTS_OF_VALUES$")) {
-                            cs.setString("object_name", "LOV:" + objectId);
-                        }
-
                         cs.setString("app_id", appId);
                         cs.registerOutParameter("page_script", Types.CLOB);
 
@@ -179,17 +174,8 @@ public class App {
                         String pageScript = cs.getString("page_script");
                         cs.close();
 
-                        String fileName = objectName.toLowerCase() + ".sql";
+                        String fileName = Apex.getFileName(appId, flowTable, objectId, objectName);
 
-                        if (flowTable.equals("WWV_FLOW_STEPS")) {
-                            fileName = "./f" + appId + "/application/pages/page_"
-                                    + String.format("%05d", Integer.valueOf(objectId)) + ".sql";
-                        }
-
-                        if (flowTable.equals("WWV_FLOW_LISTS_OF_VALUES$")) {
-                            fileName = "./f" + appId + "/application/shared_components/user_interface/lovs/"
-                                    + objectName.toLowerCase() + ".sql";
-                        }
                         FileWriter fileWriter;
                         try {
                             fileWriter = new FileWriter(fileName);
