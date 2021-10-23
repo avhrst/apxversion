@@ -52,13 +52,12 @@ begin
 wwv_flow_api.create_page(
  p_id=>5
 ,p_user_interface_id=>wwv_flow_api.id(26251251977397106)
-,p_name=>'test 4'
+,p_name=>'test '
 ,p_alias=>'TEST-3'
 ,p_step_title=>'test 3'
 ,p_autocomplete_on_off=>'OFF'
 ,p_page_template_options=>'#DEFAULT#'
-,p_last_updated_by=>'TEST'
-,p_last_upd_yyyymmddhh24miss=>'20211020003751'
+,p_last_upd_yyyymmddhh24miss=>'20211020205733'
 );
 wwv_flow_api.create_page_plug(
  p_id=>wwv_flow_api.id(34701046484275812)
