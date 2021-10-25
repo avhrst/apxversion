@@ -35,18 +35,18 @@ public class App {
         }
 
         appUser = GetPropertyValue("apex.user", "Enter the APEX user, this should be the developer's login",
-                consReader);
+                consReader).toUpperCase();
         appWorkspace = GetPropertyValue("apex.workspace", "Enter the name of the APEX workspace you want to monitor",
-                consReader);
+                consReader).toUpperCase();
         apexShema = GetPropertyValue("apex.shema", "Enter shema name where APEX is installed (APEX_XXXXXX)",
-                consReader);
+                consReader).toUpperCase();
         dbHost = GetPropertyValue("database.host", "Enter the host where the database is installed", consReader);
         dbPort = GetPropertyValue("database.port", "Enter the port the database is using", consReader);
         dbServiceName = GetPropertyValue("database.servicename", "Enter the Database service name", consReader);
         dbUser = GetPropertyValue("database.user",
                 "Enter the name of the database user who has read and write privileges to the APEX_" + apexShema
                         + "  schema. (It could be SYSTEM) ",
-                consReader);
+                consReader).toUpperCase();
         dbPassword = GetPasswordProperty("database.password", "Enter the password to connect to the database",
                 consReader);
         String intervalSecStr = GetPropertyValue("util.interval",
@@ -129,7 +129,8 @@ public class App {
                         }
                         rs.close();
                         st.close();
-                        System.out.println("Change ID: " + changeId);
+                        System.out.println("Loaded Change ID: " + changeId);
+                        System.out.println(lastChangeId);
                     }
 
                     // --- select changes ---
