@@ -67,7 +67,7 @@ public class App {
         Class.forName("oracle.jdbc.OracleDriver");
         System.out.println("Oracle JDBC driver loaded ok.");
         Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:" + dbUser + "/" + dbPassword + "@" + dbHost + ":" + dbPort + "/" + dbServiceName);
+                "jdbc:oracle:thin:" + dbUser + "/\"" + dbPassword + "\"@" + dbHost + ":" + dbPort + "/" + dbServiceName);
         System.out.println("Connected to DB");
         // ------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +130,6 @@ public class App {
                         rs.close();
                         st.close();
                         System.out.println("Loaded Change ID: " + changeId);
-                        System.out.println(lastChangeId);
                     }
 
                     // --- select changes ---
