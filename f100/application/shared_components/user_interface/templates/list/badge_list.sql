@@ -8,11 +8,11 @@ wwv_flow_api.component_begin (
 ,p_release=>'21.1.0'
 ,p_default_workspace_id=>4200481731648079
 ,p_default_application_id=>100
-,p_default_id_offset=>0
+,p_default_id_offset=>39500229701756973
 ,p_default_owner=>'VCONTROL'
 );
 wwv_flow_api.create_list_template(
- p_id=>wwv_flow_api.id(26204744073397068)
+ p_id=>wwv_flow_api.id(14897245315402526850)
 ,p_list_template_current=>wwv_flow_string.join(wwv_flow_t_varchar2(
 '<li class="t-BadgeList-item #A02#">',
 '  <a class="t-BadgeList-wrap u-color #A04#" href="#LINK#" #A03#>',

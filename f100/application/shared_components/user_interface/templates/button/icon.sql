@@ -8,11 +8,11 @@ wwv_flow_api.component_begin (
 ,p_release=>'21.1.0'
 ,p_default_workspace_id=>4200481731648079
 ,p_default_application_id=>100
-,p_default_id_offset=>0
+,p_default_id_offset=>39500229701756973
 ,p_default_owner=>'VCONTROL'
 );
 wwv_flow_api.create_button_templates(
- p_id=>wwv_flow_api.id(26226068812397078)
+ p_id=>wwv_flow_api.id(14897252571638526872)
 ,p_template_name=>'Icon'
 ,p_internal_name=>'ICON'
 ,p_template=>'<button class="t-Button t-Button--noLabel t-Button--icon #BUTTON_CSS_CLASSES#" #BUTTON_ATTRIBUTES# onclick="#JAVASCRIPT#" type="button" id="#BUTTON_ID#" title="#LABEL!ATTR#" aria-label="#LABEL!ATTR#"><span class="t-Icon #ICON_CSS_CLASSES#" aria-hidde'

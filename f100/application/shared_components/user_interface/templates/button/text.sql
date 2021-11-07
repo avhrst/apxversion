@@ -8,11 +8,11 @@ wwv_flow_api.component_begin (
 ,p_release=>'21.1.0'
 ,p_default_workspace_id=>4200481731648079
 ,p_default_application_id=>100
-,p_default_id_offset=>0
+,p_default_id_offset=>39500229701756973
 ,p_default_owner=>'VCONTROL'
 );
 wwv_flow_api.create_button_templates(
- p_id=>wwv_flow_api.id(26226728984397080)
+ p_id=>wwv_flow_api.id(14897253374800526875)
 ,p_template_name=>'Text'
 ,p_internal_name=>'TEXT'
 ,p_template=>'<button onclick="#JAVASCRIPT#" class="t-Button #BUTTON_CSS_CLASSES#" type="button" #BUTTON_ATTRIBUTES# id="#BUTTON_ID#"><span class="t-Button-label">#LABEL#</span></button>'

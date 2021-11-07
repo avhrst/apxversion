@@ -8,11 +8,11 @@ wwv_flow_api.component_begin (
 ,p_release=>'21.1.0'
 ,p_default_workspace_id=>4200481731648079
 ,p_default_application_id=>100
-,p_default_id_offset=>0
+,p_default_id_offset=>39500229701756973
 ,p_default_owner=>'VCONTROL'
 );
 wwv_flow_api.create_list_template(
- p_id=>wwv_flow_api.id(26211527110397071)
+ p_id=>wwv_flow_api.id(14897251413796526865)
 ,p_list_template_current=>'<li data-current="true" data-id="#A01#" data-disabled="#A02#" data-icon="#ICON_CSS_CLASSES#" data-shortcut="#A05#"><a href="#LINK#" title="#A04#" target="#A06#">#TEXT_ESC_SC#</a></li>'
 ,p_list_template_noncurrent=>'<li data-id="#A01#" data-disabled="#A02#" data-icon="#ICON_CSS_CLASSES#" data-shortcut="#A05#"><a href="#LINK#" title="#A04#" target="#A06#">#TEXT_ESC_SC#</a></li>'
 ,p_list_template_name=>'Side Navigation Menu'

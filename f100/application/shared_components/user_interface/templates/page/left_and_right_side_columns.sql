@@ -8,11 +8,11 @@ wwv_flow_api.component_begin (
 ,p_release=>'21.1.0'
 ,p_default_workspace_id=>4200481731648079
 ,p_default_application_id=>100
-,p_default_id_offset=>0
+,p_default_id_offset=>39500229701756973
 ,p_default_owner=>'VCONTROL'
 );
 wwv_flow_api.create_template(
- p_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(14897198130864526775)
 ,p_theme_id=>42
 ,p_name=>'Left and Right Side Columns'
 ,p_internal_name=>'LEFT_AND_RIGHT_SIDE_COLUMNS'
@@ -196,8 +196,8 @@ wwv_flow_api.create_template(
 ,p_reference_id=>2525203692562657055
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26119109924397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839102139013524516)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Content Body'
 ,p_placeholder=>'BODY'
 ,p_has_grid_support=>true
@@ -205,16 +205,16 @@ wwv_flow_api.create_page_tmpl_display_point(
 ,p_max_fixed_grid_columns=>6
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26119468475397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839102706299524516)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Breadcrumb Bar'
 ,p_placeholder=>'REGION_POSITION_01'
 ,p_has_grid_support=>false
 ,p_glv_new_row=>true
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26119798574397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839103200996524517)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Left Column'
 ,p_placeholder=>'REGION_POSITION_02'
 ,p_has_grid_support=>false
@@ -222,8 +222,8 @@ wwv_flow_api.create_page_tmpl_display_point(
 ,p_max_fixed_grid_columns=>3
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26120052063397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839103660419524517)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Right Column'
 ,p_placeholder=>'REGION_POSITION_03'
 ,p_has_grid_support=>false
@@ -231,8 +231,8 @@ wwv_flow_api.create_page_tmpl_display_point(
 ,p_max_fixed_grid_columns=>3
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26120323514397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839104185311524517)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Inline Dialogs'
 ,p_placeholder=>'REGION_POSITION_04'
 ,p_has_grid_support=>true
@@ -240,8 +240,8 @@ wwv_flow_api.create_page_tmpl_display_point(
 ,p_max_fixed_grid_columns=>12
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26120659261397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839104721248524517)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Footer'
 ,p_placeholder=>'REGION_POSITION_05'
 ,p_has_grid_support=>true
@@ -249,24 +249,24 @@ wwv_flow_api.create_page_tmpl_display_point(
 ,p_max_fixed_grid_columns=>6
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26120946376397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839105147412524518)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Page Navigation'
 ,p_placeholder=>'REGION_POSITION_06'
 ,p_has_grid_support=>false
 ,p_glv_new_row=>true
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26121259398397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839105681179524518)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Page Header'
 ,p_placeholder=>'REGION_POSITION_07'
 ,p_has_grid_support=>false
 ,p_glv_new_row=>true
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26121523778397026)
-,p_page_template_id=>wwv_flow_api.id(26118868613397025)
+ p_id=>wwv_flow_api.id(839106180076524518)
+,p_page_template_id=>wwv_flow_api.id(14897198130864526775)
 ,p_name=>'Before Content Body'
 ,p_placeholder=>'REGION_POSITION_08'
 ,p_has_grid_support=>true

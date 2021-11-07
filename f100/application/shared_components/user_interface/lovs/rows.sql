@@ -1,0 +1,64 @@
+prompt --application/shared_components/user_interface/lovs/rows
+begin
+--   Manifest
+--     ROWS
+--   Manifest End
+wwv_flow_api.component_begin (
+ p_version_yyyy_mm_dd=>'2021.04.15'
+,p_release=>'21.1.0'
+,p_default_workspace_id=>4200481731648079
+,p_default_application_id=>100
+,p_default_id_offset=>39500229701756973
+,p_default_owner=>'VCONTROL'
+);
+wwv_flow_api.create_list_of_values(
+ p_id=>wwv_flow_api.id(16347220220312894033)
+,p_lov_name=>'ROWS'
+,p_lov_query=>'.'||wwv_flow_api.id(16347220220312894033)||'.'
+,p_location=>'STATIC'
+);
+wwv_flow_api.create_static_lov_data(
+ p_id=>wwv_flow_api.id(16347220532039894036)
+,p_lov_disp_sequence=>10
+,p_lov_disp_value=>'5'
+,p_lov_return_value=>'5'
+);
+wwv_flow_api.create_static_lov_data(
+ p_id=>wwv_flow_api.id(16347220728234894039)
+,p_lov_disp_sequence=>20
+,p_lov_disp_value=>'10'
+,p_lov_return_value=>'10'
+);
+wwv_flow_api.create_static_lov_data(
+ p_id=>wwv_flow_api.id(16347220913223894039)
+,p_lov_disp_sequence=>30
+,p_lov_disp_value=>'15'
+,p_lov_return_value=>'15'
+);
+wwv_flow_api.create_static_lov_data(
+ p_id=>wwv_flow_api.id(16347221110986894039)
+,p_lov_disp_sequence=>40
+,p_lov_disp_value=>'20'
+,p_lov_return_value=>'20'
+);
+wwv_flow_api.create_static_lov_data(
+ p_id=>wwv_flow_api.id(16347221327298894039)
+,p_lov_disp_sequence=>50
+,p_lov_disp_value=>'50'
+,p_lov_return_value=>'50'
+);
+wwv_flow_api.create_static_lov_data(
+ p_id=>wwv_flow_api.id(16347221525934894039)
+,p_lov_disp_sequence=>60
+,p_lov_disp_value=>'100'
+,p_lov_return_value=>'100'
+);
+wwv_flow_api.create_static_lov_data(
+ p_id=>wwv_flow_api.id(16347221718058894039)
+,p_lov_disp_sequence=>70
+,p_lov_disp_value=>'500'
+,p_lov_return_value=>'500'
+);
+wwv_flow_api.component_end;
+end;
+/

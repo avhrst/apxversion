@@ -8,11 +8,11 @@ wwv_flow_api.component_begin (
 ,p_release=>'21.1.0'
 ,p_default_workspace_id=>4200481731648079
 ,p_default_application_id=>100
-,p_default_id_offset=>0
+,p_default_id_offset=>39500229701756973
 ,p_default_owner=>'VCONTROL'
 );
 wwv_flow_api.create_template(
- p_id=>wwv_flow_api.id(26109475137397021)
+ p_id=>wwv_flow_api.id(14897201624951526778)
 ,p_theme_id=>42
 ,p_name=>'Login'
 ,p_internal_name=>'LOGIN'
@@ -137,8 +137,8 @@ wwv_flow_api.create_template(
 ,p_reference_id=>2099711150063350616
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26109759036397022)
-,p_page_template_id=>wwv_flow_api.id(26109475137397021)
+ p_id=>wwv_flow_api.id(839108442768524522)
+,p_page_template_id=>wwv_flow_api.id(14897201624951526778)
 ,p_name=>'Content Body'
 ,p_placeholder=>'BODY'
 ,p_has_grid_support=>true
@@ -146,16 +146,16 @@ wwv_flow_api.create_page_tmpl_display_point(
 ,p_max_fixed_grid_columns=>12
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26110054244397022)
-,p_page_template_id=>wwv_flow_api.id(26109475137397021)
+ p_id=>wwv_flow_api.id(839109014965524523)
+,p_page_template_id=>wwv_flow_api.id(14897201624951526778)
 ,p_name=>'Body Header'
 ,p_placeholder=>'REGION_POSITION_01'
 ,p_has_grid_support=>false
 ,p_glv_new_row=>true
 );
 wwv_flow_api.create_page_tmpl_display_point(
- p_id=>wwv_flow_api.id(26110309017397022)
-,p_page_template_id=>wwv_flow_api.id(26109475137397021)
+ p_id=>wwv_flow_api.id(839109479975524523)
+,p_page_template_id=>wwv_flow_api.id(14897201624951526778)
 ,p_name=>'Body Footer'
 ,p_placeholder=>'REGION_POSITION_02'
 ,p_has_grid_support=>false
