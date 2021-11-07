@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -55,7 +58,7 @@ public class Util {
     BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
     textEncryptor.setPassword(secretKey);
     if (encryptedPassword == null) {
-      System.out.println("Enter the password to connect to the database");
+      System.out.println(askDescription);
       dbPassword = consReader.readLine();
       encryptedPassword = textEncryptor.encrypt(dbPassword);
       SetProperty(valueName, encryptedPassword);
@@ -64,6 +67,33 @@ public class Util {
     }
 
     return dbPassword;
+  }
+
+  public static void saveFile(String appId, String dirName, String fileName, String textScript) {
+    FileWriter fileWriter;
+    try {
+      fileWriter = new FileWriter(App.mainPath +"/"+ dirName +"/"+ fileName);
+
+    } catch (Exception e) {
+      try {
+        Files.createDirectories(Paths.get(App.mainPath +"/"+ dirName));
+        fileWriter = new FileWriter(App.mainPath +"/"+ dirName +"/"+ fileName);
+
+      } catch (IOException e1) {
+        System.out.println("The files of the exported application (application " + appId
+            + ") were not found! Please export the application from apex (zip) and unpack it into the current directory.");
+        System.out.println("The new version of the page will be written in " + App.mainPath +"/"+ dirName +"/"+ fileName);
+        e1.printStackTrace();
+        return;
+
+      }
+
+    }
+    PrintWriter printWriter = new PrintWriter(fileWriter);
+
+    printWriter.print(textScript);
+    printWriter.close();
+    System.out.println("Loaded file: " + App.mainPath +"/"+ dirName +"/"+ fileName);
   }
 
 }
