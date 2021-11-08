@@ -1,6 +1,12 @@
 # Oracle APEX version control tool
 The utility is designed to implement version control of APEX application pages.
 
+## 2.0 New version.
+- Added automatic generation of the install.sql file when adding or modifying components.
+- Versioning changes to application settings.
+- Versioning of almost all APEX components. Templates and breadcrumbs are not versioned, everything else is tracked.
+- In the parameter file, you can specify the path to the application files.
+- Missing directories and files are automatically created if they are missing. Existing files are overwritten.
 
 ## 1.1 update - support LOV versioning
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/oqcI-fjBfIY/0.jpg)](https://www.youtube.com/watch?v=oqcI-fjBfIY)
