@@ -144,7 +144,7 @@ public class Util {
         System.out.print("- deleted file: " + fileFullPath);
         System.out.println(ANSI_RESET);
       } catch (IOException e) {
-        e.printStackTrace();
+       // e.printStackTrace();
       }
 
     }

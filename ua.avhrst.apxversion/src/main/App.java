@@ -108,21 +108,14 @@ public class App {
                 + "when 'f'||v_app_id|| '/install.sql'  then :install_script := v_files(i).contents;  "
                 + "else null; end case; end loop; END;";
 
-        String selectChanges = "with a as ( "
-                + "select s.audit_date,s.flow_id app_id,object_name,s.flow_table, s.flow_table_pk object_id, "
-                + "s.SECURITY_GROUP_ID workspace_id  FROM "
-                + apexInstalledShema + ".wwv_flow_builder_audit_trail s join " + apexInstalledShema
-                + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
-                + "where s.flow_user = ? and f.workspace = ? and s.audit_date > to_date(?," + changeIdFormat + ") and "
-                + "s.flow_table  in (" + Apex.trigeredFlows + ") "
-                + "order by s.audit_date desc) " + "select a1.*, to_char(a1.audit_date," + changeIdFormat + ") change_id " 
-                + "from (select distinct max(audit_date) over(partition by object_id) audit_date, "
-                + "max(app_id) over(partition by object_id) app_id, "
-                + "max(object_name) over(partition by object_id) object_name, "
-                + "max(flow_table) over(partition by object_id) flow_table, "
-                + "max(object_id) over(partition by object_id) object_id, "
-                + "max(workspace_id) over(partition by object_id) workspace_id "
-                + "from a order by 1 desc) a1 ";
+
+        String selectChanges = "with a as (SELECT to_char(s.audit_date, 'YYYYMMDDHH24MISS') change_id, "
+                + "nvl((select max(flow_table_pk) from apex_200100.wwv_flow_builder_audit_trail where flow_table = 'WWV_FLOWS' and scn = s.scn ),s.flow_id) app_id, "
+                + "s.object_name, s.flow_table, s.flow_table_pk  object_id, s.security_group_id  workspace_id "
+                + "FROM apex_200100.wwv_flow_builder_audit_trail s "
+                + "JOIN apex_200100.wwv_flow_authorized f ON s.flow_id = f.application_id "
+                + "WHERE s.flow_user = ? AND f.workspace = ? and s.audit_date > to_date(?," + changeIdFormat + ") and  s.flow_table  in (" + Apex.trigeredFlows + ") "
+                + "ORDER BY s.audit_date DESC) select distinct * from a ";
 
    
 
