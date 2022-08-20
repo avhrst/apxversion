@@ -1,7 +1,0 @@
-{
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "ua.avhrst.apxversion/lib/jasypt-1.9.3.jar",
-        "ua.avhrst.apxversion/lib/ojdbc8.jar"
-    ]
-}
