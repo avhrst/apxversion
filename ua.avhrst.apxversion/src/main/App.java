@@ -110,10 +110,10 @@ public class App {
 
 
         String selectChanges = "with a as (SELECT to_char(s.audit_date, 'YYYYMMDDHH24MISS') change_id, "
-                + "nvl((select max(flow_table_pk) from apex_200100.wwv_flow_builder_audit_trail where flow_table = 'WWV_FLOWS' and scn = s.scn ),s.flow_id) app_id, "
+                + "nvl((select max(flow_table_pk) from APEX_210200.wwv_flow_builder_audit_trail where flow_table = 'WWV_FLOWS' and scn = s.scn ),s.flow_id) app_id, "
                 + "s.object_name, s.flow_table, s.flow_table_pk  object_id, s.security_group_id  workspace_id "
-                + "FROM apex_200100.wwv_flow_builder_audit_trail s "
-                + "JOIN apex_200100.wwv_flow_authorized f ON s.flow_id = f.application_id "
+                + "FROM APEX_210200.wwv_flow_builder_audit_trail s "
+                + "JOIN APEX_210200.wwv_flow_authorized f ON s.flow_id = f.application_id "
                 + "WHERE s.flow_user = ? AND f.workspace = ? and s.audit_date > to_date(?," + changeIdFormat + ") and  s.flow_table  in (" + Apex.trigeredFlows + ") "
                 + "ORDER BY s.audit_date DESC) select distinct * from a ";
 
