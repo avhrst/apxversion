@@ -13,6 +13,7 @@ public class App {
     static String branchName;
     static String apexUserName;
     static String apexWorkspace;
+    static String apexAppID;
     static String apexInstalledShema;
     static String dbHost;
     static String dbPort;
@@ -27,6 +28,8 @@ public class App {
     static Boolean autoLockPages = false;
 
     public static void main(String[] args) throws Exception {
+
+        apexAppID = args[0];
 
         // Enter data using BufferReader
         BufferedReader consReader = new BufferedReader(new InputStreamReader(System.in));
@@ -65,7 +68,8 @@ public class App {
                 consReader);
         // ---------------------------------------------------------------------------------------------------------
         apexWorkspace = GetPropertyValue("apex.workspace", "Enter the name of the APEX workspace you want to monitor",
-                consReader, null).toUpperCase();
+                consReader, null).toUpperCase(); 
+        
         apexUserName = GetPropertyValue("apex.user",
                 "Enter the APEX user, this should be the developer's login (APEX WEB IDE)", consReader, "5")
                         .toUpperCase();
@@ -97,7 +101,7 @@ public class App {
         String lastChangeId = "select to_char(max(s.audit_date)," + changeIdFormat + ") change_id " + "from "
                 + apexInstalledShema + ".wwv_flow_builder_audit_trail s join " + apexInstalledShema
                 + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
-                + "where s.flow_user = ? and f.workspace = ?";
+                + "where s.flow_user = ? and f.workspace = ? and f.application_id = ?";
 
         String exportScript = "DECLARE v_files  apex_t_export_files; v_components  apex_t_varchar2 := apex_t_varchar2(); "
                 + "v_app_id varchar2(10);  v_file_name varchar2(1024); "
@@ -114,7 +118,7 @@ public class App {
                 + "s.object_name, s.flow_table, s.flow_table_pk  object_id, s.security_group_id  workspace_id "
                 + "FROM "+apexInstalledShema+ ".wwv_flow_builder_audit_trail s "
                 + "JOIN "+apexInstalledShema+".wwv_flow_authorized f ON s.flow_id = f.application_id "
-                + "WHERE s.flow_user = ? AND f.workspace = ? and s.audit_date > to_date(?," + changeIdFormat + ") and  s.flow_table  in (" + Apex.trigeredFlows + ") "
+                + "WHERE s.flow_user = ? AND f.workspace = ? and f.application_id = ? and s.audit_date > to_date(?," + changeIdFormat + ") and  s.flow_table  in (" + Apex.trigeredFlows + ") "
                 + "ORDER BY s.audit_date DESC) select distinct * from a ";
 
    
@@ -132,6 +136,7 @@ public class App {
                         st = conn.prepareStatement(lastChangeId);
                         st.setString(1, apexUserName);
                         st.setString(2, apexWorkspace);
+                        st.setString(3, apexAppID);
                         rs = st.executeQuery();
                         while (rs.next()) {
                             changeId = rs.getString("CHANGE_ID");
@@ -145,7 +150,8 @@ public class App {
                     st = conn.prepareStatement(selectChanges);
                     st.setString(1, apexUserName);
                     st.setString(2, apexWorkspace);
-                    st.setString(3, changeId);
+                    st.setString(3, apexAppID);
+                    st.setString(4, changeId);
 
                     rs = st.executeQuery();
                     while (rs.next()) {

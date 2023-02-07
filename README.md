@@ -33,7 +33,7 @@ Permanently saving the page file (PL / SQL) and applying version control techniq
 
 Copy the jar file to your project directory and run the command
 ``` 
-java -jar apxversion.jar
+java -jar apxversion.jar 101
 ```
 At the first start, you must specify the parameters necessary for the utility to work.
 The parameters can be changed in the config.properties file. If you need to reinstall the settings, simply delete the config.properties file.
