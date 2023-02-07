@@ -29,8 +29,6 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
-        apexAppID = args[0];
-
         // Enter data using BufferReader
         BufferedReader consReader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -68,11 +66,14 @@ public class App {
                 consReader);
         // ---------------------------------------------------------------------------------------------------------
         apexWorkspace = GetPropertyValue("apex.workspace", "Enter the name of the APEX workspace you want to monitor",
-                consReader, null).toUpperCase(); 
-        
+                consReader, null).toUpperCase();
+
+        apexAppID = GetPropertyValue("apex.app.id", "Enter the ID of the APEX app you want to monitor",
+                consReader, null).toUpperCase();
+
         apexUserName = GetPropertyValue("apex.user",
                 "Enter the APEX user, this should be the developer's login (APEX WEB IDE)", consReader, "5")
-                        .toUpperCase();
+                .toUpperCase();
 
         if (intervalSecStr == null) {
             intervalSec = 5;
@@ -112,16 +113,14 @@ public class App {
                 + "when 'f'||v_app_id|| '/install.sql'  then :install_script := v_files(i).contents;  "
                 + "else null; end case; end loop; END;";
 
-
         String selectChanges = "with a as (SELECT to_char(s.audit_date, 'YYYYMMDDHH24MISS') change_id, "
                 + "nvl((select max(flow_table_pk) from APEX_210200.wwv_flow_builder_audit_trail where flow_table = 'WWV_FLOWS' and scn = s.scn ),s.flow_id) app_id, "
                 + "s.object_name, s.flow_table, s.flow_table_pk  object_id, s.security_group_id  workspace_id "
-                + "FROM "+apexInstalledShema+ ".wwv_flow_builder_audit_trail s "
-                + "JOIN "+apexInstalledShema+".wwv_flow_authorized f ON s.flow_id = f.application_id "
-                + "WHERE s.flow_user = ? AND f.workspace = ? and f.application_id = ? and s.audit_date > to_date(?," + changeIdFormat + ") and  s.flow_table  in (" + Apex.trigeredFlows + ") "
+                + "FROM " + apexInstalledShema + ".wwv_flow_builder_audit_trail s "
+                + "JOIN " + apexInstalledShema + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
+                + "WHERE s.flow_user = ? AND f.workspace = ? and f.application_id = ? and s.audit_date > to_date(?,"
+                + changeIdFormat + ") and  s.flow_table  in (" + Apex.trigeredFlows + ") "
                 + "ORDER BY s.audit_date DESC) select distinct * from a ";
-
-   
 
         java.util.TimerTask task = new java.util.TimerTask() {
             @Override
@@ -129,7 +128,7 @@ public class App {
                 try {
                     PreparedStatement st;
                     CallableStatement cs;
-                  
+
                     ResultSet rs;
                     // -- last change_id --
                     if (changeId == null) {
@@ -160,7 +159,6 @@ public class App {
                         String objectId = rs.getString("OBJECT_ID");
                         changeId = rs.getString("CHANGE_ID");
                         String flowTable = rs.getString("FLOW_TABLE");
-                     
 
                         System.out.println("Type: " + flowTable + " for object: " + objectName + " changed. ChangeID: "
                                 + changeId);
@@ -173,7 +171,6 @@ public class App {
                         cs.setString("app_id", appId);
                         cs.setString("file_name", dirName + "/" + fileName);
 
-                     
                         cs.registerOutParameter("page_script", Types.CLOB);
                         cs.registerOutParameter("install_script", Types.CLOB);
                         cs.execute();
