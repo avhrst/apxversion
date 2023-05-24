@@ -114,7 +114,7 @@ public class App {
                 + "else null; end case; end loop; END;";
 
         String selectChanges = "with a as (SELECT to_char(s.audit_date, 'YYYYMMDDHH24MISS') change_id, "
-                + "nvl((select max(flow_table_pk) from APEX_210200.wwv_flow_builder_audit_trail where flow_table = 'WWV_FLOWS' and scn = s.scn ),s.flow_id) app_id, "
+                + "nvl((select max(flow_table_pk) from " + apexInstalledShema + ".wwv_flow_builder_audit_trail where flow_table = 'WWV_FLOWS' and scn = s.scn ),s.flow_id) app_id, "
                 + "s.object_name, s.flow_table, s.flow_table_pk  object_id, s.security_group_id  workspace_id "
                 + "FROM " + apexInstalledShema + ".wwv_flow_builder_audit_trail s "
                 + "JOIN " + apexInstalledShema + ".wwv_flow_authorized f ON s.flow_id = f.application_id "
