@@ -1,61 +1,69 @@
 BEGIN
-  SYS.DBMS_SCHEDULER.CREATE_JOB
-    (
-       job_name        => 'APXVERSION$JOB'
-      ,start_date      => TO_TIMESTAMP_TZ('2022/08/20 01:33:35.456000 US/Mountain','yyyy/mm/dd hh24:mi:ss.ff tzr')
-      ,repeat_interval => 'FREQ=secondly;INTERVAL=5'
-      ,end_date        => NULL
-      ,job_class       => 'DEFAULT_JOB_CLASS'
-      ,job_type        => 'PLSQL_BLOCK'
-      ,job_action      => 'BEGIN
-APXVERSION$API.versioning_workspace;
-COMMIT;
-END;'
-      ,comments        => NULL
-    );
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'RESTARTABLE'
-     ,value     => FALSE);
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'LOGGING_LEVEL'
-     ,value     => SYS.DBMS_SCHEDULER.LOGGING_OFF);
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE_NULL
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'MAX_FAILURES');
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE_NULL
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'MAX_RUNS');
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'STOP_ON_WINDOW_CLOSE'
-     ,value     => FALSE);
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'JOB_PRIORITY'
-     ,value     => 3);
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE_NULL
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'SCHEDULE_LIMIT');
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'AUTO_DROP'
-     ,value     => FALSE);
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'RESTART_ON_RECOVERY'
-     ,value     => FALSE);
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'RESTART_ON_FAILURE'
-     ,value     => TRUE);
-  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE
-    ( name      => 'APXVERSION$JOB'
-     ,attribute => 'STORE_OUTPUT'
-     ,value     => TRUE);
-
-  SYS.DBMS_SCHEDULER.ENABLE
-    (name                  => 'APXVERSION$JOB');
+  SYS.DBMS_SCHEDULER.CREATE_JOB ( JOB_NAME => 'APXVERSION$JOB', 
+          START_DATE => TO_TIMESTAMP_TZ('2022/08/20 01:33:35.456000 US/Mountain', 'yyyy/mm/dd hh24:mi:ss.ff tzr'), 
+          REPEAT_INTERVAL => 'FREQ=secondly;INTERVAL=5', 
+          END_DATE => NULL, 
+          JOB_CLASS => 'DEFAULT_JOB_CLASS', 
+          JOB_TYPE => 'PLSQL_BLOCK', 
+          JOB_ACTION => ' BEGIN
+                          APXVERSION$API.versioning_workspace;
+                          COMMIT;
+                          END;', 
+            COMMENTS => NULL );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'RESTARTABLE',
+    VALUE => FALSE
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'LOGGING_LEVEL',
+    VALUE => SYS.DBMS_SCHEDULER.LOGGING_OFF
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE_NULL (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'MAX_FAILURES'
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE_NULL (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'MAX_RUNS'
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'STOP_ON_WINDOW_CLOSE',
+    VALUE => FALSE
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'JOB_PRIORITY',
+    VALUE => 3
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE_NULL (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'SCHEDULE_LIMIT'
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'AUTO_DROP',
+    VALUE => FALSE
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'RESTART_ON_RECOVERY',
+    VALUE => FALSE
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'RESTART_ON_FAILURE',
+    VALUE => TRUE
+  );
+  SYS.DBMS_SCHEDULER.SET_ATTRIBUTE (
+    NAME => 'APXVERSION$JOB',
+    ATTRIBUTE => 'STORE_OUTPUT',
+    VALUE => TRUE
+  );
+  SYS.DBMS_SCHEDULER.ENABLE (
+    NAME => 'APXVERSION$JOB'
+  );
 END;
 /

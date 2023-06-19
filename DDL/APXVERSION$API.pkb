@@ -1,6 +1,5 @@
-CREATE OR REPLACE PACKAGE BODY APXVERSION$API
-AS
-    /******************************************************************************
+CREATE OR REPLACE PACKAGE BODY APXVERSION$API AS
+ /******************************************************************************
        NAME:       APXVERSION$API
        PURPOSE:
 
@@ -9,380 +8,300 @@ AS
        ---------  ----------  ---------------  ------------------------------------
        1.0        8/20/2022      avhrs       1. Created this package body.
     ******************************************************************************/
-
-
-
-    FUNCTION EncodeBASE64 (InClearChar IN OUT NOCOPY CLOB)
-        RETURN CLOB
-    IS
-        dest_lob       BLOB;
-        lang_context   INTEGER := DBMS_LOB.DEFAULT_LANG_CTX;
-        dest_offset    INTEGER := 1;
-        src_offset     INTEGER := 1;
-        read_offset    INTEGER := 1;
-        warning        INTEGER;
-        ClobLen        INTEGER := DBMS_LOB.GETLENGTH (InClearChar);
-
-        amount         INTEGER := 1440;       -- must be a whole multiple of 3
-        -- size of a whole multiple of 48 is beneficial to get NEW_LINE after each 64 characters
-        buffer         RAW (1440);
-        res            CLOB := EMPTY_CLOB ();
+    FUNCTION ENCODEBASE64 (
+        INCLEARCHAR IN OUT NOCOPY CLOB
+    ) RETURN CLOB IS
+        DEST_LOB     BLOB;
+        LANG_CONTEXT INTEGER := DBMS_LOB.DEFAULT_LANG_CTX;
+        DEST_OFFSET  INTEGER := 1;
+        SRC_OFFSET   INTEGER := 1;
+        READ_OFFSET  INTEGER := 1;
+        WARNING      INTEGER;
+        CLOBLEN      INTEGER := DBMS_LOB.GETLENGTH (INCLEARCHAR);
+        AMOUNT       INTEGER := 1440; -- must be a whole multiple of 3
+ -- size of a whole multiple of 48 is beneficial to get NEW_LINE after each 64 characters
+        BUFFER       RAW (1440);
+        RES          CLOB := EMPTY_CLOB ();
     BEGIN
-        IF InClearChar IS NULL OR NVL (ClobLen, 0) = 0
-        THEN
+        IF INCLEARCHAR IS NULL OR NVL (CLOBLEN, 0) = 0 THEN
             RETURN NULL;
-        ELSIF ClobLen <= 24000
-        THEN
-            res :=
-                UTL_RAW.CAST_TO_VARCHAR2 (
-                    UTL_ENCODE.BASE64_ENCODE (
-                        UTL_RAW.CAST_TO_RAW (InClearChar)));
-            res := REPLACE (REPLACE (res, CHR (13), NULL), CHR (10), NULL);
-
-            RETURN res;
+        ELSIF CLOBLEN <= 24000 THEN
+            RES := UTL_RAW.CAST_TO_VARCHAR2 ( UTL_ENCODE.BASE64_ENCODE ( UTL_RAW.CAST_TO_RAW (INCLEARCHAR)));
+            RES := REPLACE (REPLACE (RES, CHR (13), NULL), CHR (10), NULL);
+            RETURN RES;
         END IF;
-
-        -- UTL_ENCODE.BASE64_ENCODE is limited to 32k/(3/4), process in chunks if bigger
-
-        DBMS_LOB.CREATETEMPORARY (dest_lob, TRUE);
-        DBMS_LOB.CONVERTTOBLOB (dest_lob,
-                                InClearChar,
-                                DBMS_LOB.LOBMAXSIZE,
-                                dest_offset,
-                                src_offset,
-                                DBMS_LOB.DEFAULT_CSID,
-                                lang_context,
-                                warning);
-
+ -- UTL_ENCODE.BASE64_ENCODE is limited to 32k/(3/4), process in chunks if bigger
+        DBMS_LOB.CREATETEMPORARY (DEST_LOB, TRUE);
+        DBMS_LOB.CONVERTTOBLOB (DEST_LOB, INCLEARCHAR, DBMS_LOB.LOBMAXSIZE, DEST_OFFSET, SRC_OFFSET, DBMS_LOB.DEFAULT_CSID, LANG_CONTEXT, WARNING);
         LOOP
-            EXIT WHEN read_offset >= dest_offset;
-            DBMS_LOB.READ (dest_lob,
-                           amount,
-                           read_offset,
-                           buffer);
-            res :=
-                   res
-                || UTL_RAW.CAST_TO_VARCHAR2 (
-                       UTL_ENCODE.BASE64_ENCODE (buffer));
-            read_offset := read_offset + amount;
+            EXIT WHEN READ_OFFSET >= DEST_OFFSET;
+            DBMS_LOB.READ (DEST_LOB, AMOUNT, READ_OFFSET, BUFFER);
+            RES := RES
+                || UTL_RAW.CAST_TO_VARCHAR2 ( UTL_ENCODE.BASE64_ENCODE (BUFFER));
+            READ_OFFSET := READ_OFFSET + AMOUNT;
         END LOOP;
-
-        DBMS_LOB.FREETEMPORARY (dest_lob);
-        res := REPLACE (REPLACE (res, CHR (13), NULL), CHR (10), NULL);
-        RETURN res;
-    END EncodeBASE64;
-
-    FUNCTION ora_hash_clob (p_clob IN CLOB)
-        RETURN CLOB
-    IS
-        TYPE t_ora_hash_tab IS TABLE OF NUMBER
-            INDEX BY BINARY_INTEGER;
-
-        l_ora_hash_tab        t_ora_hash_tab;
-        l_line                VARCHAR2 (4000);
-        l_ora_hash_key        NUMBER;
-        l_ora_hash_clob_key   CLOB;
+        DBMS_LOB.FREETEMPORARY (DEST_LOB);
+        RES := REPLACE (REPLACE (RES, CHR (13), NULL), CHR (10), NULL);
+        RETURN RES;
+    END ENCODEBASE64;
+    FUNCTION ORA_HASH_CLOB (
+        P_CLOB IN CLOB
+    ) RETURN CLOB IS
+        TYPE T_ORA_HASH_TAB IS
+            TABLE OF NUMBER INDEX BY BINARY_INTEGER;
+        L_ORA_HASH_TAB      T_ORA_HASH_TAB;
+        L_LINE              VARCHAR2 (4000);
+        L_ORA_HASH_KEY      NUMBER;
+        L_ORA_HASH_CLOB_KEY CLOB;
     BEGIN
-        FOR i IN 1 .. CEIL (LENGTH (p_clob) / 4000)
-        LOOP
-            l_line := TO_CHAR (SUBSTR (p_clob, (i - 1) * 4000 + 1, 4000));
-
-            SELECT ORA_HASH (l_line) INTO l_ora_hash_key FROM DUAL;
-
-            l_ora_hash_tab (i) := l_ora_hash_key;
+        FOR I IN 1 .. CEIL (LENGTH (P_CLOB) / 4000) LOOP
+            L_LINE := TO_CHAR (SUBSTR (P_CLOB, (I - 1) * 4000 + 1, 4000));
+            SELECT
+                ORA_HASH (L_LINE) INTO L_ORA_HASH_KEY
+            FROM
+                DUAL;
+            L_ORA_HASH_TAB (I) := L_ORA_HASH_KEY;
         END LOOP;
-
-        FOR i IN 1 .. l_ora_hash_tab.COUNT
-        LOOP
-            l_ora_hash_clob_key :=
-                l_ora_hash_clob_key || TO_CLOB (l_ora_hash_tab (i));
+        FOR I IN 1 .. L_ORA_HASH_TAB.COUNT LOOP
+            L_ORA_HASH_CLOB_KEY := L_ORA_HASH_CLOB_KEY
+                || TO_CLOB (L_ORA_HASH_TAB (I));
         END LOOP;
-
-        RETURN l_ora_hash_clob_key;
+        RETURN L_ORA_HASH_CLOB_KEY;
     END;
-
-    PROCEDURE set_headers
-    AS
+    PROCEDURE SET_HEADERS AS
     BEGIN
-        apex_web_service.g_request_headers (1).name := 'User-Agent';
-        apex_web_service.g_request_headers (1).VALUE := 'oracle-db';
-
-        apex_web_service.g_request_headers (2).name := 'Authorization';
-        apex_web_service.g_request_headers (2).VALUE :=
-            'Bearer ' || u_.GIT_TOKEN;
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (1).NAME := 'User-Agent';
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (1).VALUE := 'oracle-db';
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (2).NAME := 'Authorization';
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (2).VALUE := 'Bearer '
+            || U_.GIT_TOKEN;
     END;
-
-    FUNCTION user_profile (p_user IN VARCHAR2)
-        RETURN CLOB
-    AS
-        l_request_url   VARCHAR2 (1024);
-        l_result        CLOB;
+    FUNCTION USER_PROFILE (
+        P_USER IN VARCHAR2
+    ) RETURN CLOB AS
+        L_REQUEST_URL VARCHAR2 (1024);
+        L_RESULT      CLOB;
     BEGIN
-        l_request_url := g_base_url || '/users/' || p_user;
-        set_headers;
-        l_result :=
-            apex_web_service.make_rest_request (p_url           => l_request_url,
-                                                p_http_method   => 'GET');
-        RETURN l_result;
+        L_REQUEST_URL := G_BASE_URL
+            || '/users/'
+            || P_USER;
+        SET_HEADERS;
+        L_RESULT := APEX_WEB_SERVICE.MAKE_REST_REQUEST (P_URL => L_REQUEST_URL, P_HTTP_METHOD => 'GET');
+        RETURN L_RESULT;
     END;
-
-    FUNCTION get_file_sha (p_file_name IN VARCHAR2)
-        RETURN VARCHAR2
-    AS
-        l_request_url   VARCHAR2 (1024);
-        l_result        CLOB;
-        l_status_code   INT;
+    FUNCTION GET_FILE_SHA (
+        P_FILE_NAME IN VARCHAR2
+    ) RETURN VARCHAR2 AS
+        L_REQUEST_URL VARCHAR2 (1024);
+        L_RESULT      CLOB;
+        L_STATUS_CODE INT;
     BEGIN
-        l_request_url :=
-               g_base_url
+        L_REQUEST_URL := G_BASE_URL
             || '/repos/'
-            || u_.GIT_USER
+            || U_.GIT_USER
             || '/'
-            || a_.APP_REPO
+            || A_.APP_REPO
             || '/contents/'
-            || p_file_name;
-
-        set_headers;
-        apex_web_service.g_request_headers (3).name := 'Content-Type';
-        apex_web_service.g_request_headers (3).VALUE := 'application/json';
-
-        l_result :=
-            apex_web_service.make_rest_request (p_url           => l_request_url,
-                                                p_http_method   => 'GET');
-
-        l_status_code := apex_web_service.g_status_code;
-
-        IF l_status_code = 200
-        THEN
-            APEX_JSON.parse (l_result);
-            RETURN APEX_JSON.get_varchar2 (p_path => 'sha');
+            || P_FILE_NAME;
+        SET_HEADERS;
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (3).NAME := 'Content-Type';
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (3).VALUE := 'application/json';
+        L_RESULT := APEX_WEB_SERVICE.MAKE_REST_REQUEST (P_URL => L_REQUEST_URL, P_HTTP_METHOD => 'GET');
+        L_STATUS_CODE := APEX_WEB_SERVICE.G_STATUS_CODE;
+        IF L_STATUS_CODE = 200 THEN
+            APEX_JSON.PARSE (L_RESULT);
+            RETURN APEX_JSON.GET_VARCHAR2 (
+                P_PATH => 'sha'
+            );
         END IF;
-
         RETURN NULL;
     END;
-
-
-
-    PROCEDURE push_file (p_file_name IN VARCHAR2, p_file IN CLOB)
-    AS
-        l_request_url   VARCHAR2 (1024);
-        l_result        CLOB;
-        l_base64        CLOB;
-        l_json          CLOB;
-        l_status_code   INT;
-
-        l_sha           VARCHAR2 (255);
-        l_file_clob     CLOB := p_file;
+    PROCEDURE PUSH_FILE (
+        P_FILE_NAME IN VARCHAR2,
+        P_FILE IN CLOB
+    ) AS
+        L_REQUEST_URL VARCHAR2 (1024);
+        L_RESULT      CLOB;
+        L_BASE64      CLOB;
+        L_JSON        CLOB;
+        L_STATUS_CODE INT;
+        L_SHA         VARCHAR2 (255);
+        L_FILE_CLOB   CLOB := P_FILE;
     BEGIN
-        l_sha := get_file_sha (p_file_name => p_file_name);
-
-        l_request_url :=
-               g_base_url
+        L_SHA := GET_FILE_SHA (P_FILE_NAME => P_FILE_NAME);
+        L_REQUEST_URL := G_BASE_URL
             || '/repos/'
-            || u_.GIT_USER
+            || U_.GIT_USER
             || '/'
-            || a_.APP_REPO
+            || A_.APP_REPO
             || '/contents/'
-            || p_file_name;
-        l_base64 := EncodeBASE64 (InClearChar => l_file_clob);
-        apex_json.initialize_clob_output;
-        apex_json.open_object;
-        apex_json.write ('message', 'commit ' || p_file_name);
-        apex_json.write ('content', l_base64);
-        apex_json.write ('sha', l_sha);
-        apex_json.close_object;
-        l_json := apex_json.get_clob_output;
-        apex_json.free_output;
-
-        set_headers;
-        apex_web_service.g_request_headers (3).name := 'Content-Type';
-        apex_web_service.g_request_headers (3).VALUE := 'application/json';
-
-        l_result :=
-            apex_web_service.make_rest_request (p_url           => l_request_url,
-                                                p_http_method   => 'PUT',
-                                                p_body          => l_json);
-
-        l_status_code := apex_web_service.g_status_code;
-
-        --       IF l_status_code = 200
-        --      THEN
-        --      END IF;
-        --  exception when others then
-        --  null;
-
-        DBMS_OUTPUT.put_line (l_result);
+            || P_FILE_NAME;
+        L_BASE64 := ENCODEBASE64 (INCLEARCHAR => L_FILE_CLOB);
+        APEX_JSON.INITIALIZE_CLOB_OUTPUT;
+        APEX_JSON.OPEN_OBJECT;
+        APEX_JSON.WRITE ('message', 'commit '
+            || P_FILE_NAME);
+        APEX_JSON.WRITE ('content', L_BASE64);
+        APEX_JSON.WRITE ('sha', L_SHA);
+        APEX_JSON.CLOSE_OBJECT;
+        L_JSON := APEX_JSON.GET_CLOB_OUTPUT;
+        APEX_JSON.FREE_OUTPUT;
+        SET_HEADERS;
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (3).NAME := 'Content-Type';
+        APEX_WEB_SERVICE.G_REQUEST_HEADERS (3).VALUE := 'application/json';
+        L_RESULT := APEX_WEB_SERVICE.MAKE_REST_REQUEST (P_URL => L_REQUEST_URL, P_HTTP_METHOD => 'PUT', P_BODY => L_JSON);
+        L_STATUS_CODE := APEX_WEB_SERVICE.G_STATUS_CODE;
+ --       IF l_status_code = 200
+ --      THEN
+ --      END IF;
+ --  exception when others then
+ --  null;
+        DBMS_OUTPUT.PUT_LINE (L_RESULT);
     END;
-
-
-    FUNCTION is_exist_apxversion_file (p_file_name IN VARCHAR2)
-        RETURN BOOLEAN
-    AS
-        l_ex   INT;
+    FUNCTION IS_EXIST_APXVERSION_FILE (
+        P_FILE_NAME IN VARCHAR2
+    ) RETURN BOOLEAN AS
+        L_EX INT;
     BEGIN
-        SELECT COUNT (*)
-          INTO l_ex
-          FROM APXVERSION$FILES
-         WHERE     REPO_NAME = a_.APP_REPO
-               AND BRANCH_NAME = a_.APP_BRANCH
-               AND FILE_NAME = p_file_name;
-
-        IF l_ex = 1
-        THEN
+        SELECT
+            COUNT (*) INTO L_EX
+        FROM
+            APXVERSION$FILES
+        WHERE
+            REPO_NAME = A_.APP_REPO
+            AND BRANCH_NAME = A_.APP_BRANCH
+            AND FILE_NAME = P_FILE_NAME;
+        IF L_EX = 1 THEN
             RETURN TRUE;
         END IF;
-
         RETURN FALSE;
     END;
-
-
-    PROCEDURE get_file_info (r_ IN OUT APXVERSION$FILES%ROWTYPE)
-    AS
-        l_page_id   INT;
+    PROCEDURE GET_FILE_INFO (
+        R_ IN OUT APXVERSION$FILES%ROWTYPE
+    ) AS
+        L_PAGE_ID INT;
     BEGIN
-        IF INSTR (r_.FILE_NAME, '/application/pages/') != 0
-        THEN
+        IF INSTR (R_.FILE_NAME, '/application/pages/') != 0 THEN
             BEGIN
-                l_page_id :=
-                    TO_NUMBER (
-                        SUBSTR (
-                            r_.FILE_NAME,
-                            INSTR (r_.FILE_NAME, '/application/pages/') + 20,
-                            5));
-
-                SELECT DISTINCT
-                       MAX (developer)
-                           KEEP (DENSE_RANK LAST ORDER BY AUDIT_DATE)
-                           OVER ()    DEVELOPER,
-                       MAX (AUDIT_DATE)
-                           KEEP (DENSE_RANK LAST ORDER BY AUDIT_DATE)
-                           OVER ()    AUDIT_DATE
-                  INTO r_.DEVELOPER, r_.AUDIT_DATE
-                  FROM APEX_DEVELOPER_ACTIVITY_LOG
-                 WHERE application_id = a_.APP_ID AND page_id = l_page_id;
+                L_PAGE_ID := TO_NUMBER ( SUBSTR ( R_.FILE_NAME, INSTR (R_.FILE_NAME, '/application/pages/') + 20, 5));
+                SELECT
+                    DISTINCT MAX (DEVELOPER) KEEP (DENSE_RANK LAST
+                ORDER BY
+                    AUDIT_DATE) OVER () DEVELOPER,
+                    MAX (AUDIT_DATE) KEEP (DENSE_RANK LAST
+                ORDER BY
+                    AUDIT_DATE) OVER () AUDIT_DATE INTO R_.DEVELOPER,
+                    R_.AUDIT_DATE
+                FROM
+                    APEX_DEVELOPER_ACTIVITY_LOG
+                WHERE
+                    APPLICATION_ID = A_.APP_ID
+                    AND PAGE_ID = L_PAGE_ID;
             EXCEPTION
-                WHEN OTHERS
-                THEN
+                WHEN OTHERS THEN
                     NULL;
             END;
         END IF;
-
-        IF r_.DEVELOPER IS NULL
-        THEN
-            r_.DEVELOPER := a_.DEVELOPER;
-            r_.AUDIT_DATE := a_.AUDIT_DATE;
+        IF R_.DEVELOPER IS NULL THEN
+            R_.DEVELOPER := A_.DEVELOPER;
+            R_.AUDIT_DATE := A_.AUDIT_DATE;
         END IF;
-
-        SELECT *
-          INTO u_
-          FROM APXVERSION$USERS
-         WHERE USER_NAME = r_.DEVELOPER;
+        SELECT
+            * INTO U_
+        FROM
+            APXVERSION$USERS
+        WHERE
+            USER_NAME = R_.DEVELOPER;
     END;
-
-
-    PROCEDURE export_app
-    AS
-        l_files       apex_t_export_files;
-        l_content     CLOB;
-        r_            APXVERSION$FILES%ROWTYPE;
-        l_file_name   VARCHAR2 (1024);
-        l_file_hash   VARCHAR2 (255);
-        l_new         BOOLEAN;
+    PROCEDURE EXPORT_APP AS
+        L_FILES     APEX_T_EXPORT_FILES;
+        L_CONTENT   CLOB;
+        R_          APXVERSION$FILES%ROWTYPE;
+        L_FILE_NAME VARCHAR2 (1024);
+        L_FILE_HASH VARCHAR2 (255);
+        L_NEW       BOOLEAN;
     BEGIN
-        l_files :=
-            apex_export.get_application (p_application_id   => a_.APP_ID,
-                                         p_split            => TRUE,
-                                         p_with_date        => FALSE,
-                                         p_type             => g_export_type);
-
-        FOR i IN 1 .. l_files.COUNT
-        LOOP
-            r_ := NULL;
-            l_new := FALSE;
-
-            l_file_name := l_files (i).name;
-            DBMS_OUTPUT.put_line ('Source:    ' || l_file_name);
-
-            l_content := l_files (i).contents;
-            l_file_hash := ora_hash_clob (p_clob => l_content);
-
-            IF is_exist_apxversion_file (l_file_name) = FALSE
-            THEN
-                l_new := TRUE;
-                r_.REPO_NAME := a_.APP_REPO;
-                r_.BRANCH_NAME := a_.APP_BRANCH;
-                r_.FILE_NAME := l_file_name;
-                r_.SH1 := l_file_hash;
-                r_.APP_ID := a_.APP_ID;
+        L_FILES := APEX_EXPORT.GET_APPLICATION (P_APPLICATION_ID => A_.APP_ID, P_SPLIT => TRUE, P_WITH_DATE => FALSE, P_TYPE => G_EXPORT_TYPE);
+        FOR I IN 1 .. L_FILES.COUNT LOOP
+            R_ := NULL;
+            L_NEW := FALSE;
+            L_FILE_NAME := L_FILES (I).NAME;
+            DBMS_OUTPUT.PUT_LINE ('Source:    '
+                || L_FILE_NAME);
+            L_CONTENT := L_FILES (I).CONTENTS;
+            L_FILE_HASH := ORA_HASH_CLOB (
+                P_CLOB => L_CONTENT
+            );
+            IF IS_EXIST_APXVERSION_FILE (L_FILE_NAME) = FALSE THEN
+                L_NEW := TRUE;
+                R_.REPO_NAME := A_.APP_REPO;
+                R_.BRANCH_NAME := A_.APP_BRANCH;
+                R_.FILE_NAME := L_FILE_NAME;
+                R_.SH1 := L_FILE_HASH;
+                R_.APP_ID := A_.APP_ID;
             ELSE
-                SELECT *
-                  INTO r_
-                  FROM APXVERSION$FILES
-                 WHERE     REPO_NAME = a_.APP_REPO
-                       AND BRANCH_NAME = a_.APP_BRANCH
-                       AND FILE_NAME = l_file_name;
+                SELECT
+                    * INTO R_
+                FROM
+                    APXVERSION$FILES
+                WHERE
+                    REPO_NAME = A_.APP_REPO
+                    AND BRANCH_NAME = A_.APP_BRANCH
+                    AND FILE_NAME = L_FILE_NAME;
             END IF;
-
-            get_file_info (r_);
-
-
-            IF l_new = TRUE OR l_file_hash != r_.SH1
-            THEN
-                push_file (p_file_name => l_file_name, p_file => l_content);
+            GET_FILE_INFO (R_);
+            IF L_NEW = TRUE OR L_FILE_HASH != R_.SH1 THEN
+                PUSH_FILE (
+                    P_FILE_NAME => L_FILE_NAME,
+                    P_FILE => L_CONTENT
+                );
             END IF;
-
-
-            IF l_new = TRUE
-            THEN
-                INSERT INTO APXVERSION$FILES
-                     VALUES r_;
-            ELSIF l_file_hash != r_.SH1
-            THEN
-                r_.SH1 := l_file_hash;
-
-
+            IF L_NEW = TRUE THEN
+                INSERT INTO APXVERSION$FILES VALUES R_;
+            ELSIF L_FILE_HASH != R_.SH1 THEN
+                R_.SH1 := L_FILE_HASH;
                 UPDATE APXVERSION$FILES
-                   SET row = r_
-                 WHERE     REPO_NAME = a_.APP_REPO
-                       AND BRANCH_NAME = a_.APP_BRANCH
-                       AND FILE_NAME = l_file_name;
+                SET
+                    ROW = R_
+                WHERE
+                    REPO_NAME = A_.APP_REPO
+                    AND BRANCH_NAME = A_.APP_BRANCH
+                    AND FILE_NAME = L_FILE_NAME;
             END IF;
         END LOOP;
     END;
-
-
-    PROCEDURE versioning_workspace
-    AS
-        CURSOR cur1 IS
-            SELECT DISTINCT
-                   l.application_id,
-                   MAX (l.AUDIT_DATE)
-                       KEEP (DENSE_RANK LAST ORDER BY l.AUDIT_DATE)
-                       OVER (PARTITION BY l.application_id)    AUDIT_DATE,
-                   MAX (l.developer)
-                       KEEP (DENSE_RANK LAST ORDER BY l.AUDIT_DATE)
-                       OVER (PARTITION BY l.application_id)    DEVELOPER
-              FROM APEX_DEVELOPER_ACTIVITY_LOG  l
-                   JOIN APXVERSION$APP a ON l.application_id = a.APP_ID
-             WHERE l.AUDIT_DATE > a.AUDIT_DATE;
+    PROCEDURE VERSIONING_WORKSPACE AS
+        CURSOR CUR1 IS
+            SELECT
+                DISTINCT L.APPLICATION_ID,
+                MAX (L.AUDIT_DATE) KEEP (DENSE_RANK LAST
+            ORDER BY
+                L.AUDIT_DATE) OVER (
+                PARTITION BY L.APPLICATION_ID) AUDIT_DATE, MAX (L.DEVELOPER) KEEP (DENSE_RANK LAST ORDER BY L.AUDIT_DATE) OVER (PARTITION BY L.APPLICATION_ID) DEVELOPER
+            FROM
+                APEX_DEVELOPER_ACTIVITY_LOG L
+                JOIN APXVERSION$APP A
+                ON L.APPLICATION_ID = A.APP_ID
+            WHERE
+                L.AUDIT_DATE > A.AUDIT_DATE
     BEGIN
-        FOR c1 IN cur1
-        LOOP
-            SELECT *
-              INTO a_
-              FROM APXVERSION$APP
-             WHERE APP_ID = c1.application_id;
-
-            --- save audit date --
-            a_.AUDIT_DATE := c1.AUDIT_DATE;
-            a_.DEVELOPER := c1.DEVELOPER;
-
-            export_app;
-
-            UPDATE APXVERSION$APP
-               SET row = a_
-             WHERE APP_ID = c1.application_id;
-        END LOOP;
-    END;
+        FOR C1 IN CUR1 LOOP
+            SELECT
+                * INTO A_
+            FROM
+                APXVERSION$APP
+            WHERE
+                APP_ID = C1.APPLICATION_ID;
+ --- save audit date --
+        A_.AUDIT_DATE := C1.AUDIT_DATE;
+        A_.DEVELOPER := C1.DEVELOPER;
+        EXPORT_APP;
+        UPDATE APXVERSION$APP
+        SET
+            ROW = A_
+        WHERE
+            APP_ID = C1.APPLICATION_ID;
+    END LOOP;
+END;
 END APXVERSION$API;
 /

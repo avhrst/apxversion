@@ -1,6 +1,5 @@
-CREATE OR REPLACE PACKAGE APXVERSION$API
-AS
-    /******************************************************************************
+CREATE OR REPLACE PACKAGE APXVERSION$API AS
+ /******************************************************************************
        NAME:       APXVERSION$API
        PURPOSE:
 
@@ -9,17 +8,13 @@ AS
        ---------  ----------  ---------------  ------------------------------------
        1.0        8/20/2022      avhrs       1. Created this package.
     ******************************************************************************/
-
-    a_              APXVERSION$APP%ROWTYPE;
-    u_              APXVERSION$USERS%ROWTYPE;
-
-    g_base_url      VARCHAR2 (255) := 'https://api.github.com';
-    g_export_type   VARCHAR2 (50) := 'READABLE_JSON';
-
-    FUNCTION user_profile (p_user IN VARCHAR2)
-        RETURN CLOB;
-
-
-    PROCEDURE versioning_workspace;
+    A_            APXVERSION$APP%ROWTYPE;
+    U_            APXVERSION$USERS%ROWTYPE;
+    G_BASE_URL    VARCHAR2 (255) := 'https://api.github.com';
+    G_EXPORT_TYPE VARCHAR2 (50) := 'READABLE_JSON';
+    FUNCTION USER_PROFILE (
+        P_USER IN VARCHAR2
+    ) RETURN CLOB;
+    PROCEDURE VERSIONING_WORKSPACE;
 END APXVERSION$API;
 /
